@@ -21,3 +21,4 @@ profiles.clj
 /.vscode
 *file
 /resources/public/js
+/resources/main.js
