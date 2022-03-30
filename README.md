@@ -1,21 +1,13 @@
-# kol
+# Kol
 
-generated using Luminus version "4.35"
+## Development
 
-FIXME
-
-## Prerequisites
-
-You will need [Leiningen][1] 2.0 or above installed.
-
-[1]: https://github.com/technomancy/leiningen
-
-## Running
-
-To start a web server for the application, run:
-
-    lein run 
+- server: `clj -M:dev -m user`
+- app: `npx shadow-cljs -d cider/cider-nrepl:0.27.4 watch :render :main`
+- styles `npm run styles-watch`
+- electron: `npx electron .`
+- re-frisk: `clj -M:dev scripts/re_frisk.clj`
 
 ## License
 
-Copyright © 2022 FIXME
+Copyright © 2022
