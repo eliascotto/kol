@@ -1,0 +1,50 @@
+#!/usr/bin/env bb
+(ns convert-project
+  (:require
+   [clojure.string :as string]))
+
+(def deps
+  [[:buddy/buddy-auth "3.0.323"]
+   [:buddy/buddy-core "1.10.413"]
+   [:buddy/buddy-hashers "1.8.158"]
+   [:buddy/buddy-sign "3.4.333"]
+   [:ch.qos.logback/logback-classic "1.2.10"]
+   [:cljs-ajax "0.8.4"]
+   [:clojure.java-time "0.3.3"]
+   [:com.cognitect/transit-clj "1.0.329"]
+   [:com.cognitect/transit-cljs "0.8.269"]
+   [:conman "0.9.3"]
+   [:cprop "0.1.19"]
+   [:day8.re-frame/http-fx "0.2.4"]
+   [:expound "0.9.0"]
+   [:funcool/struct "1.4.0"]
+   [:json-html "0.4.7"]
+   [:luminus-http-kit "0.1.9"]
+   [:luminus-transit "0.1.5"]
+   [:luminus/ring-ttl-session "0.3.3"]
+   [:markdown-clj "1.10.8"]
+   [:metosin/muuntaja "0.6.8"]
+   [:metosin/reitit "0.5.15"]
+   [:metosin/ring-http-response "0.9.3"]
+   [:mount "0.1.16"]
+   [:nrepl "0.9.0"]
+   [:org.babashka/sci "0.3.3"]
+   [:org.clojure/clojure "1.10.3"]
+   [:org.clojure/clojurescript "1.11.4" :scope "provided"]
+   [:org.clojure/core.async "1.5.648"]
+   [:org.clojure/tools.cli "1.0.206"]
+   [:org.clojure/tools.logging "1.2.4"]
+   [:org.postgresql/postgresql "42.3.2"]
+   [:org.webjars.npm/bulma "0.9.3"]
+   [:org.webjars.npm/material-icons "1.0.0"]
+   [:org.webjars/webjars-locator "0.42"]
+   [:re-frame "1.2.0"]
+   [:reagent "1.1.0"]
+   [:ring-webjars "0.2.0"]
+   [:ring/ring-core "1.9.5"]
+   [:ring/ring-defaults "0.3.3"]
+   [:selmer "1.12.50"]
+   [:thheller/shadow-cljs "2.17.0" :scope "provided"]])
+
+(defn convert-deps [deps]
+  ())
