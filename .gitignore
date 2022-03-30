@@ -20,3 +20,4 @@ profiles.clj
 /.lsp
 /.vscode
 *file
+/resources/public/js
