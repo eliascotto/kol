@@ -22,3 +22,4 @@ profiles.clj
 *file
 /resources/public/js
 /resources/main.js
+/resources/public/css
