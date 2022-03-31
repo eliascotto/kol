@@ -9,7 +9,7 @@
                  "flex-row"
                  "items-center"
                  "justify-center"
-                 "shadow-lg"
+                 "shadow-md"
                 ;;  "border-b"
                 ;;  "border-solid"
                 ;;  "border-neutral-700"

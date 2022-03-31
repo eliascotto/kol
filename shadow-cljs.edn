@@ -25,6 +25,9 @@
                       :preloads  [re-frisk-remote.preload]}
    :compiler-options {:output-feature-set :es-next
                       :reader-features #{:electron}}
+   :js-options       {:resolve
+                      {"one-dark" {:target :file
+                                   :file "src/js/one-dark.js"}}}
    :dev              {:closure-defines
                       {"re_frame.trace.trace_enabled_QMARK_" true
                        kol.env/DEBUG true}}

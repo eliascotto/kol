@@ -1,7 +1,8 @@
 {:paths ["src/clj" "src/cljc" "src/cljs" "resources"]
 
  :deps
- {buddy/buddy-auth {:mvn/version "3.0.323"}
+ {applied-science/js-interop {:mvn/version "0.3.3"}
+  buddy/buddy-auth {:mvn/version "3.0.323"}
   buddy/buddy-core {:mvn/version "1.10.413"}
   buddy/buddy-hashers {:mvn/version "1.8.158"}
   buddy/buddy-sign {:mvn/version "3.4.333"}
@@ -22,6 +23,7 @@
   luminus-transit/luminus-transit {:mvn/version "0.1.5"}
   luminus/ring-ttl-session {:mvn/version "0.3.3"}
   markdown-clj/markdown-clj {:mvn/version "1.10.8"}
+  meander/epsilon {:mvn/version "0.0.650"}
   metosin/muuntaja {:mvn/version "0.6.8"}
   metosin/reitit {:mvn/version "0.5.15"}
   metosin/ring-http-response {:mvn/version "0.9.3"}

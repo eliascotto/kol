@@ -4,4 +4,5 @@
 ;; To run it
 ;; $ clj -M:dev scripts/re_frisk.clj
 
+(println "Starting re-frisk remote server...")
 (re-frisk-remote/start)

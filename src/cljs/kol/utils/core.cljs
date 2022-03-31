@@ -1,5 +1,10 @@
 (ns kol.utils.core)
 
+(defn now
+  "Return actual datetime."
+  []
+  (.now js/Date))
+
 (defn get-val
   "Get the value from event target."
   [evt]

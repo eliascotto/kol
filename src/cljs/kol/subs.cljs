@@ -6,9 +6,9 @@
   (fn [db _]
     (get-in db keys)))
 
-(defn def-sub-handler
+(defn def-sub
   ([k]
-   (def-sub-handler k k))
+   (def-sub k k))
   ([k-sub k]
    (rf/reg-sub k-sub (db-get k))))
 
@@ -68,3 +68,6 @@
  :<- [:repl]
  (fn [repl _]
    (:placeholder repl)))
+
+;; Source code
+(def-sub :source)

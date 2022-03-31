@@ -1,6 +1,11 @@
-(ns kol.env)
+(ns kol.env
+  (:require
+   [kol.utils.core :refer [now]]))
+
 (goog-define DEBUG false)
 
 (defn debug [& args]
   (when DEBUG
-    (.log js/console (apply str (into ["DEBUG "] args)))))
+    (->> (into ["DEBUG: "] args)
+         (apply str)
+         (.log js/console))))

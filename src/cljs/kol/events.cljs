@@ -18,7 +18,14 @@
 (def default-db
   {:repl
    {:history [{:type :special
-               :value "Clojure REPL v1.0"}]}})
+               :value "Clojure REPL v1.0"}]}
+   :source ";; Your Clojure file
+(defn fizz-buzz [n]
+  (condp (fn [a b] (zero? (mod b a))) n
+    15 \"fizzbuzz\"
+    3  \"fizz\"
+    5  \"buzz\"
+    n))"})
 
 ;; ----------------------
 ;; Dispatchers
