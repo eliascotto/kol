@@ -7,11 +7,10 @@
 
 (defn icon
   "TODO: add comment"
-  [icon-name & {:as props}]
+  [icon-name props]
   (let [full-name (str (pascal-case icon-name) "Icon")
-        default-class {:class ["h-5" "w-5" "inline-block"]}
+        default-props {:class ["h-5" "w-5" "inline-block"]}
         icon-set (if (-> props :outline true?) herooutline herosolid)]
-    [:div
-     (->> (dissoc props :outline)
-          (merge-with into default-class))
-     [(g/get icon-set full-name)]]))
+    [:div (->> (dissoc props :outline)
+               (merge-with into default-props))
+     [:> (g/get icon-set full-name)]]))

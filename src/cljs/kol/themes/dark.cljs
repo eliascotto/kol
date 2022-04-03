@@ -16,6 +16,7 @@
    :fg "#E1E1E6"
    :selection "#41414D"
    :comment "#483C67"
+   :parens "#CCCCCC"
    :currentLine "#44475a"
    :bgLighter "#252131"
    :bgLight "#201B2D"
@@ -26,19 +27,13 @@
   (or (get colors k)
       (get element-colors k)))
 
-;; Your Clojure file
-(defn fizz-buzz [n]
-  (condp (fn [a b] (zero? (mod b a))) n
-    15 "fizzbuzz"
-    3  "fizz"
-    5  "buzz"
-    n))
-
 (def theme
   (create-theme
    {"&" {:color (color :fg)
          :background-color "transparent"
-         :font-size "12px"}
+         :font-size "13px"
+         :font-family "\"Fira Code\",monospace,-apple-system,BlinkMacSystemFont,sans-serif"}
+    ".cm-scroller" {:font-family "\"Fira Code\",monospace,-apple-system,BlinkMacSystemFont,sans-serif"}
     ".cm-content" {:caret-color (color :fg)}
     ".cm-cursor, .cm-dropCursor" {:border-left-color (color :fg)}
 
@@ -48,14 +43,18 @@
                   :color (color :fg)}
     ".cm-panels.cm-panels-top" {:border-bottom "2px solid black"}
     ".cm-panels.cm-panels-bottom" {:border-top "2px solid black"}
-    
+
+    ".cm-activeLine" {:background-color (color :currentLine)}
+
     ".cm-gutters" {:background-color "transparent"
-                   :color (color :fg)
-                   :border "none"}}))
+                   :color (color :currentLine)
+                   :border "none"}
+    ".cm-activeLineGutter" {:background-color (color :currentLine)}}))
 
 (def highlight
   (create-highlight
    [{:tag (.-keyword t), :color (color :pink)}
+    {:tag (.-bracket t), :color (color :parens)}
     {:tag
      [(.-name t) (.-deleted t) (.-character t) (.-propertyName t)
       (.-macroName t)],
@@ -73,7 +72,7 @@
     {:tag
      [(.-operator t) (.-operatorKeyword t) (.-url t) (.-escape t)
       (.-regexp t) (.-link t) (.special t (.-string t))],
-     :color (color :yellow)} 
+     :color (color :yellow)}
     {:tag  [(.-meta t) (.-comment t)], :color (color :comment)}
     {:tag (.-strong t), :fontWeight "bold"}
     {:tag (.-emphasis t), :fontStyle "italic"}
@@ -83,6 +82,6 @@
     {:tag  [(.-atom t) (.-bool t) (.special t (.-variableName t))],
      :color (color :red)}
     {:tag  [(.-processingInstruction t) (.-string t) (.-inserted t)],
-     :color (color :yellow)} 
+     :color (color :yellow)}
     {:tag (.-invalid t), :color (color :red)}]))
 

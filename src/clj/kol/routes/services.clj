@@ -9,7 +9,6 @@
    [reitit.ring.middleware.parameters :as parameters]
    [kol.middleware.formats :as formats]
    [ring.util.http-response :refer :all]
-   [kol.controllers.exec :as exec]
    [clojure.java.io :as io]))
 
 (defn service-routes []
@@ -47,11 +46,17 @@
             {:url "/api/swagger.json"
              :config {:validator-url nil}})}]]
 
-   ["/exec"
-    {:post {:summary "Exec function!"
-            :parameters {:body {:source string?}}
-            :responses {200 {:body {:output string?}}}
-            :handler #'exec/exec}}]
+   ["/ddoc"
+    {:get {:summary "Get function documentation"
+            :parameters {:query {:symbol string?}}
+            :responses {200 {:body {:doc string?}}}
+            :handler (fn [{{{:keys [symbol]} :body} :parameters}]
+                       {:doc symbol
+                     ;;    (:doc (-> sym
+                     ;;                   symbol
+                     ;;                   var
+                     ;;                   meta))
+                        })}}]
 
    ["/math"
     {:swagger {:tags ["math"]}}

@@ -22,13 +22,14 @@
    [nextjournal.clojure-mode.test-utils :as test-utils]
    [kol.themes.dark :refer [theme highlight]]))
 
+(declare update-source)
+
 (defonce extensions
   #js[theme
       highlight
       (history)
-      ;; highlight/defaultHighlightStyle
       (view/drawSelection)
-      ;(lineNumbers)
+      (lineNumbers)
       (fold/foldGutter)
       (.. EditorState -allowMultipleSelections (of true))
       (if false
@@ -37,7 +38,11 @@
             (.slice cm-clj/default-extensions 1)]
         cm-clj/default-extensions)
       (.of view/keymap cm-clj/complete-keymap)
-      (.of view/keymap historyKeymap)])
+      (.of view/keymap historyKeymap)
+      (.of (.-updateListener EditorView)
+           (fn [^js v]
+             (when (.-docChanged v)
+               (update-source (.. v -state -doc toString)))))])
 
 (defn make-state [extensions doc]
   (let [[doc ranges]
@@ -66,30 +71,39 @@
                        extensions
                        (j/push! extensions))})))
 
-
-(defn create-editor
-  "Create a new CodeMirror editor instance."
-  [el view source]
-  (let [editor-params (j/lit
-                       {:state
-                        (make-state
-                         #js[extensions]
-                         source)
-                        :parent el})]
-    (when el
-      (reset! view (new EditorView editor-params)))))
+(defn update-source [source]
+  (rf/dispatch [:source-update source]))
 
 (defn editor-el [source]
-  (r/with-let [editor-view (r/atom nil)]
-    [:div {:class ["rounded-md"
-                   "mb-0"
-                   "text-sm"
-                   "monospace"
-                   "overflow-auto"]
-           :ref #(create-editor % editor-view source)}]
-    (finally
-      (when-let [view @editor-view]
-        (j/call view :destroy)))))
+  (r/with-let [editor-view (r/atom nil)
+               editor-ref (r/atom nil)
+               editor-state (r/atom nil)]
+    (r/create-class
+     {:display-name "editor-component"
+
+      :component-did-mount
+      (fn []
+        (let [state (make-state #js[extensions] source)
+              editor-params (j/lit {:state state
+                                    :parent @editor-ref})]
+          (when @editor-ref
+            (reset! editor-state state)
+            (reset! editor-view (new EditorView editor-params)))))
+
+      :component-will-unmount
+      (fn []
+        (when @editor-view
+          (j/call @editor-view :destroy)))
+
+      :reagent-render
+      (fn []
+        (.log js/console @editor-state)
+        [:div {:class ["rounded-md"
+                       "mb-0"
+                       "text-sm"
+                       "monospace"
+                       "overflow-auto"]
+               :ref #(reset! editor-ref %)}])})))
 
 (defn editor []
   (let [source @(rf/subscribe [:source])]

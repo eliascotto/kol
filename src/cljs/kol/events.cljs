@@ -21,7 +21,7 @@
                :value "Clojure REPL v1.0"}]}
    :source ";; Your Clojure file
 (defn fizz-buzz [n]
-  (condp (fn [a b] (zero? (mod b a))) n
+  (case n
     15 \"fizzbuzz\"
     3  \"fizz\"
     5  \"buzz\"
@@ -118,3 +118,8 @@
  :repl-set-placeholder
  (fn [db [_ value]]
    (assoc-in db [:repl :placeholder] value)))
+
+(rf/reg-event-db
+ :source-update
+ (fn [db [_ value]]
+   (assoc db :source value)))
