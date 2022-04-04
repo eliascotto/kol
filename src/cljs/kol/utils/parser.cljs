@@ -46,7 +46,7 @@
         body (nthrest xs (if has-doc? 4 3))]
     [block {:func (str f-name)
             :pre "def"
-            :post [wrapper/vector (map str args)]
+            :post [wrapper/vector args]
             :level lvl}
      (args->blk body lvl)]))
 

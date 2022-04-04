@@ -1,11 +1,12 @@
-(ns kol.comp.atom.add-block
+(ns kol.comp.atom.button-add-block
   (:require
    [kol.comp.atom.icon :refer [icon]]))
 
-(defn button []
-  [:div {:class ["p-1" "cursor-pointer"
+(defn button [opts]
+  [:div {:class ["px-1" "cursor-pointer"
                  "text-neutral-500"
                  "hover:text-neutral-300"]
          :title "Add a new block"}
    [icon "plus"
-    {:class ["w-4" "h-4"]}]])
+    {:class ["w-3" "h-3"]
+     :on-click (:on-click opts)}]])

@@ -21,17 +21,6 @@
   [:span {:class ["mx-1" font-size "text-[#78D1E1]"]}
    s])
 
-(defn item [p i len]
-  [:span {:class ["px-1"
-                  (cond (= len 1) ;; Single
-                        "px-0"
-                        (zero? i) ;; First
-                        "pl-0"
-                        (= i (dec len)) ;; Last
-                        "pr-0")
-                  "cursor-pointer"]}
-   p])
-
 (defn vector [x]
   [:div {:class ["bg-slate-800"
                  "text-[#CCCCCC]"
@@ -43,4 +32,13 @@
                  "px-1.5"]}
    (for-indexed [[index item] x]
                 ^{:key (str "vector-opt-" item x)}
-                [item item index (count x)])])
+                (let [len (count x)]
+                  [:span {:class ["px-1"
+                                  (cond (= len 1) ;; Single
+                                        "px-0"
+                                        (zero? index) ;; First
+                                        "pl-0"
+                                        (= index (dec len)) ;; Last
+                                        "pr-0")
+                                  "cursor-pointer"]}
+                   item]))])

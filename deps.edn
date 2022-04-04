@@ -42,6 +42,7 @@
   org.webjars/webjars-locator {:mvn/version "0.42"}
   re-frame/re-frame {:mvn/version "1.2.0"}
   reagent/reagent {:mvn/version "1.1.0"}
+  rewrite-clj/rewrite-clj {:mvn/version "1.0.699-alpha"}
   ring-webjars/ring-webjars {:mvn/version "0.2.0"}
   ring/ring-core {:mvn/version "1.9.5"}
   ring/ring-defaults {:mvn/version "0.3.3"}
