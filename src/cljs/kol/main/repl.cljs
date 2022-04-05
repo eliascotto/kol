@@ -1,4 +1,5 @@
 (ns kol.main.repl
+  "Namespace used to manage the connection with nREPL."
   (:refer-clojure :exclude [eval])
   (:require
    ["net" :as net]

@@ -20,9 +20,16 @@
    [nextjournal.clojure-mode.node :as n]
    [nextjournal.clojure-mode.selections :as sel]
    [nextjournal.clojure-mode.test-utils :as test-utils]
-   [kol.themes.dark :refer [theme highlight]]))
+   [kol.themes.dark :refer [theme highlight]]
+   ["lezer-generator" :as lg]
+   [shadow.resource :as rc]))
 
 (declare update-source)
+
+(def parser
+  (lg/buildParser
+   (rc/inline "./clojure.grammar")
+   #js{:externalProp n/node-prop}))
 
 (defonce extensions
   #js[theme
@@ -34,7 +41,7 @@
       (.. EditorState -allowMultipleSelections (of true))
       (if false
         ;; use live-reloading grammar
-        #js[(cm-clj/syntax live-grammar/parser)
+        #js[(cm-clj/syntax parser)
             (.slice cm-clj/default-extensions 1)]
         cm-clj/default-extensions)
       (.of view/keymap cm-clj/complete-keymap)

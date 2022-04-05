@@ -18,3 +18,11 @@ html, body, #app {
            rounded-none;
   }
 }
+
+@layer utilities {
+  .placeholder-block::placeholder{
+    @apply 
+    italic
+    font-sans;
+  }
+}

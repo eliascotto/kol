@@ -14,3 +14,19 @@
 (comment
   (for [i (range 7)]
     (str "bg-slate-"  (str (- 700 (* i 100))))))
+
+;; Record for define each block inside the visual workspace.
+;; Each block should be unique and updated when a user updates 
+;; the workspace or the source. Is this a good way to maintain 1:1?
+;; sexpr the content of the list
+;; index of the list in the parent
+;; level is the depth of the list
+(defrecord Block [sexpr index level])
+
+(comment
+  (let [b (Block. '(map 1) 0 0)
+        a (Block. '(map 1) 1 0)]
+    (:level b)
+    (:arra b)
+    (= a b)))
+    

@@ -1,4 +1,5 @@
 (ns kol.main.core
+  "Main node process executed by Electron."
   (:require
    ["electron" :refer [app BrowserWindow ipcMain]]
    ["path" :as path]
@@ -65,6 +66,8 @@
 
 (defn on-app-quit []
   (repl/close))
+
+;; Main file executed by Electron
 
 (defn main []
   (.on app "window-all-closed" #(when-not (= js/process.platform "darwin")

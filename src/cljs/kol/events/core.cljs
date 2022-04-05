@@ -1,9 +1,11 @@
-(ns kol.events
+(ns kol.events.core
   (:require
    [re-frame.core :as rf]
    [ajax.core :as ajax]
    [reitit.frontend.easy :as rfe]
-   [reitit.frontend.controllers :as rfc]))
+   [reitit.frontend.controllers :as rfc]
+   [kol.events.repl]
+   [kol.events.blocks]))
 
 ;; ----------------------
 ;; Helpers
@@ -16,9 +18,15 @@
   (str base-url route))
 
 (def default-db
-  {:repl
+  {;; Repl configuration
+   :repl
    {:history [{:type :special
                :value "Clojure REPL v1.0"}]}
+   ;; Current edited block
+   :blocks
+   {:selected nil
+    :input-value nil}
+   ;; Current file source
    :source ";; Your Clojure file
 (defn fizz-buzz [n]
   (case n
@@ -81,43 +89,6 @@
  :navigate!
  (fn [_ [_ url-key params query]]
    {:common/navigate-fx! [url-key params query]}))
-
-(rf/reg-event-db
- :repl-history-append
- (fn [db [_ item]]
-   (let [history (-> db :repl :history)]
-     (assoc-in
-      db
-      [:repl :history]
-      (conj history item)))))
-
-(rf/reg-event-db
- :repl-input-set
- (fn [db [_ value]]
-   (assoc-in db [:repl :input] value)))
-
-(rf/reg-event-db
- :repl-input-reset
- (fn [db _]
-   (assoc-in db [:repl :input] nil)))
-
-(rf/reg-event-db
- :repl-multiline-append
- (fn [db [_ value]]
-   (let [old (get-in db [:repl :multiline])]
-     (assoc-in db [:repl :multiline] (str old value)))))
-
-;; Reset completely the current input into the REPL
-(rf/reg-event-db
- :repl-reset-all
- (fn [db _]
-   (update-in db [:repl] merge {:input nil
-                                :multiline nil
-                                :placeholder nil})))
-(rf/reg-event-db
- :repl-set-placeholder
- (fn [db [_ value]]
-   (assoc-in db [:repl :placeholder] value)))
 
 (rf/reg-event-db
  :source-update

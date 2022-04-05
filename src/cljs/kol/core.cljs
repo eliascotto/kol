@@ -8,7 +8,7 @@
    [goog.history.EventType :as HistoryEventType]
    [markdown.core :refer [md->html]]
    [kol.ajax :as ajax]
-   [kol.events]
+   [kol.events.core]
    [kol.subs]
    [kol.defs]
    [kol.pages.create :refer [create-page]]

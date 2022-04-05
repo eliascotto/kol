@@ -71,3 +71,20 @@
 
 ;; Source code
 (def-sub :source)
+
+(rf/reg-sub
+ :blocks
+ (fn [db _]
+   (-> db :blocks)))
+
+(rf/reg-sub
+ :blocks-selected
+ :<- [:blocks]
+ (fn [blocks _]
+   (:selected blocks)))
+
+(rf/reg-sub
+ :blocks-input-value
+ :<- [:blocks]
+ (fn [blocks _]
+   (:input-value blocks)))
