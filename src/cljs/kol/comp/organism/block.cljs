@@ -1,24 +1,35 @@
-(ns kol.comp.molecules.block
+(ns kol.comp.organism.block
   (:require
    [re-frame.core :as rf]
-   [kol.icons :refer [settings-icon]]
    [kol.indents :refer [indents]]))
 
-(defn block-bg [lvl]
+(defn block-bg
+  "Return a string of the background class for the block."
+  [lvl]
   (->> ;;(- 800 (* lvl 100))
    (if (even? lvl) 800 700)
    (str "bg-slate-")))
 
-(defn block-color [bg-color]
+(defn block-color
+  "Return a string of the text color class for the block."
+  [bg-color]
   "text-slate-200")
 
-(defn inline-args-count [f]
-  (get-in indents [(symbol f) :block]))
+(defn inline-args-count
+  "Get the number of inline argument based on the
+  function f."
+  [f]
+  (if (not f)
+    0
+    (get-in indents [(symbol f) :block])))
 
-(defn args-even? [f]
-  (get-in indents [(symbol f) :even]))
+(defn args-even?
+  "Returns true if arguments has to be indented evenly."
+  [f]
+  (when f
+    (get-in indents [(symbol f) :even])))
 
-(defn block-header [opts]
+(defn block-header [opts chld]
   (let [func (:func opts)
         pre (:pre opts)
         post (:post opts)]
@@ -45,27 +56,24 @@
                :text-size-adjust "100%"}}
         func])
      (when post
-       [:div {:class ["text-xs"]}
+       [:div
         post])
-  ;;  [:span {:class ["cursor-pointer"
-  ;;                  "text-neutral-300"
-  ;;                  "text-xs"]}
-  ;;   [settings-icon]]
-     ]))
+     (when chld
+       [:div {:class ["text-xs" "flex" "flex-row"
+                      "items-center" "space-x-1"]}
+        chld])]))
 
 (defn on-block-click [blk]
   (rf/dispatch [:blocks-set-selected blk]))
-
-(defn on-block-blur []
-  (rf/dispatch [:blocks-reset-selected]))
 
 (defn block [opts blk args]
   (let [lvl (or (:level blk) 0)
         bg-color (block-bg lvl)
         func (:func opts)
-        pcount (inline-args-count func)
-        inline-args (when pcount (take pcount args))
-        args (nthrest args pcount)
+        inline-count (inline-args-count func)
+        inline-args (when inline-count
+                      (take inline-count args))
+        newline-args (nthrest args inline-count)
         selected @(rf/subscribe [:blocks-selected])
         focused? (= selected blk)]
     [:div {:class [bg-color
@@ -80,31 +88,26 @@
                    "font-normal"
                    "text-[13px]"
                    (block-color bg-color)
-                   (when (zero? lvl) "border 
-                                       border-slate-500
-                                       border")]
-           :on-click #(on-block-click blk)
-           :on-blur on-block-blur}
-     (if focused?
-       (let [input-value @(rf/subscribe [:blocks-input-value])]
-         [:input {:class [bg-color
-                          (block-color bg-color)
-                          "outline-none"]
-                  :auto-focus true
-                  :value input-value}])
-       [:<>
+                   "border"
+                   (if focused?
+                     "border-slate-500"
+                     (if (zero? lvl)
+                       "border-slate-700"
+                       "border-transparent"))]
+           :on-click (fn [e]
+                       (.preventDefault e)
+                       (.stopPropagation e)
+                       (on-block-click blk))}
+     [:div {:class ["flex" "flex-col"]}
         ;; Header
-        [block-header
-         (if (and (not (:post opts)) pcount)
-           (assoc opts :post inline-args)
-           opts)]
+      [block-header opts inline-args]
         ;; Content
-        [:div {:class ["px-2"]}
-         (if (args-even? func)
+      [:div {:class ["px-2"]}
+       (if (args-even? func)
            ;; Args grid for event arguments
-           [:div {:class ["grid"]
-                  :style {:grid-template-columns "min-content 1fr"}}
-            (for [a args]
-              [:div {:class ["overflow-hidden"]}
-               a])]
-           args)]])]))
+         [:div {:class ["grid"]
+                :style {:grid-template-columns "min-content 1fr"}}
+          (for [a newline-args]
+            [:div {:class ["overflow-hidden"]}
+             a])]
+         newline-args)]]]))

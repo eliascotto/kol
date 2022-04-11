@@ -10,7 +10,7 @@
    'catch           {:block 2}
    'comment         {:block 0}
    'cond            {:block 0}
-   'condp           {:block 2}
+   'condp           {:block 2 :even true}
    'cond->          {:block 1}
    'cond->>         {:block 1}
    'defprotocol     {:block 1}

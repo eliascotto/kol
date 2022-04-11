@@ -1,4 +1,4 @@
-(ns kol.defs)
+(ns kol.definitions)
 
 (def block-colors
   ["bg-slate-900"
@@ -21,7 +21,7 @@
 ;; sexpr the content of the list
 ;; index of the list in the parent
 ;; level is the depth of the list
-(defrecord Block [sexpr index level])
+(defrecord Block [sexpr index level parent])
 
 (comment
   (let [b (Block. '(map 1) 0 0)
@@ -29,4 +29,8 @@
     (:level b)
     (:arra b)
     (= a b)))
-    
+
+(def block-types
+  [{:type :function :label "Define a function"}
+   {:type :fn :label "Inline function"}
+   {:type :list :label "Call a function"}])

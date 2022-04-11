@@ -84,7 +84,7 @@
    (:selected blocks)))
 
 (rf/reg-sub
- :blocks-input-value
+ :blocks-list
  :<- [:blocks]
  (fn [blocks _]
-   (:input-value blocks)))
+   (:list blocks)))

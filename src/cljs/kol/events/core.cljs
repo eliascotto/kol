@@ -25,10 +25,9 @@
    ;; Current edited block
    :blocks
    {:selected nil
-    :input-value nil}
+    :list []}
    ;; Current file source
-   :source ";; Your Clojure file
-(defn fizz-buzz [n]
+   :source "(defn fizz-buzz [n]
   (case n
     15 \"fizzbuzz\"
     3  \"fizz\"

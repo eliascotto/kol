@@ -5,7 +5,6 @@
 (rf/reg-event-db
  :blocks-set-selected
  (fn [db [_ blk]]
-   (rf/dispatch [:blocks-set-input-value (:sexpr blk)])
    (assoc-in db [:blocks :selected] blk)))
 
 (rf/reg-event-db
@@ -14,6 +13,11 @@
    (assoc-in db [:blocks :selected] nil)))
 
 (rf/reg-event-db
- :blocks-set-input-value
- (fn [db [_ value]]
-   (assoc-in db [:blocks :input-value] value)))
+ :blocks-reset-list
+ (fn [db [_]]
+   (assoc-in db [:blocks :list] [])))
+
+(rf/reg-event-db
+ :blocks-append-to-list
+ (fn [db [_ item]]
+   (update-in db [:blocks :list] conj item)))

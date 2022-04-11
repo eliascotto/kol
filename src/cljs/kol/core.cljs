@@ -10,7 +10,7 @@
    [kol.ajax :as ajax]
    [kol.events.core]
    [kol.subs]
-   [kol.defs]
+   [kol.definitions]
    [kol.pages.create :refer [create-page]]
    [kol.pages.source :refer [source-page]]
    [kol.comp.organism.navbar :refer [navbar]]
