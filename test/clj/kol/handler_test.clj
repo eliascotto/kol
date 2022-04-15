@@ -2,7 +2,7 @@
   (:require
     [clojure.test :refer :all]
     [ring.mock.request :refer :all]
-    [kol.handler :refer :all]
+    [kol.router :refer :all]
     [kol.middleware.formats :as formats]
     [muuntaja.core :as m]
     [mount.core :as mount]))
@@ -14,7 +14,7 @@
   :once
   (fn [f]
     (mount/start #'kol.config/env
-                 #'kol.handler/app-routes)
+                 #'kol.router/app-routes)
     (f)))
 
 (deftest test-app

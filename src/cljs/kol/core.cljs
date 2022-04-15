@@ -11,9 +11,10 @@
    [kol.events.core]
    [kol.subs]
    [kol.definitions]
+   [kol.socket :as socket]
    [kol.pages.create :refer [create-page]]
    [kol.pages.source :refer [source-page]]
-   [kol.comp.organism.navbar :refer [navbar]]
+   [kol.comp.navbar.core :refer [navbar]]
    [reitit.core :as reitit]
    [reitit.frontend.easy :as rfe]
    [clojure.string :as string])
@@ -33,9 +34,10 @@
 
 (defn page []
   (when-let [page @(rf/subscribe [:common/page])]
-    [:div {:class ["h-full" "flex" "flex-col"]}
+    [:div {:class ["h-full"]}
      [navbar]
-     [page]]))
+     [:div
+      [page]]]))
 
 ;; --- Router -------------------
 
@@ -56,10 +58,7 @@
                :view #'about-page}]]))
 
 (defn start-router! []
-  (rfe/start!
-   router
-   navigate!
-   {}))
+  (rfe/start! router navigate! {}))
 
 ;; --- Initialize app -------------------------
 
@@ -69,6 +68,7 @@
 
 (defn init! []
   (start-router!)
+  (socket/start!)
   (ajax/load-interceptors!)
   (mount-components)
   (rf/dispatch-sync [:initialize-db]))

@@ -20,7 +20,7 @@
    (-> db :common/route)))
 
 (rf/reg-sub
- :common/page-id
+ :route/page-id
  :<- [:common/route]
  (fn [route _]
    (-> route :data :name)))

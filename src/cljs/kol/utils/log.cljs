@@ -1,0 +1,7 @@
+(ns kol.utils.log)
+
+(def error
+  (.-error js/console))
+
+(def debug
+  (.-log js/console))

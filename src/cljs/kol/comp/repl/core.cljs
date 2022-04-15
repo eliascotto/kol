@@ -1,4 +1,4 @@
-(ns kol.comp.organism.repl
+(ns kol.comp.repl.core
   (:require
    [re-frame.core :as rf]
    [cljs.reader :as reader]
@@ -6,7 +6,7 @@
    [edamame.core :as edamame]
    [reagent.core :as r]
    [kol.env :refer [debug]]
-   [kol.comp.molecules.repl-view :refer [repl-view]]))
+   [kol.comp.repl.view :refer [repl-view]]))
 
 (defn- multiline?
   "Return true if the current input is multiline."

@@ -1,7 +1,7 @@
 (ns kol.pages.source
   (:require
-   [kol.comp.organism.repl :as repl]
-   [kol.comp.organism.editor :refer [editor]]))
+   [kol.comp.repl.core :as repl]
+   [kol.comp.editor.core :refer [editor]]))
 
 (defn source-page []
   [:div {:class ["flex" "flex-row"

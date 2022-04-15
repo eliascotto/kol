@@ -13,6 +13,7 @@
    'condp           {:block 2 :even true}
    'cond->          {:block 1}
    'cond->>         {:block 1}
+   'defmethod       {:block 2}
    'defprotocol     {:block 1}
    'defrecord       {:block 2}
    'defstruct       {:block 1}
@@ -33,7 +34,7 @@
    'if-let          {:block 1}
    'if-not          {:block 1}
    'if-some         {:block 1}
-   'let             {:block 1}
+   'let             {:block 1 :arg-vec true}
    'letfn           {:block 1}
    'locking         {:block 1}
    'loop            {:block 1}

@@ -1,4 +1,4 @@
-(ns kol.comp.molecules.code-wrappers
+(ns kol.comp.block.code-wrappers
   (:refer-clojure :exclude [symbol vector keyword map])
   (:require
    [kol.macros :refer [for-indexed]]))

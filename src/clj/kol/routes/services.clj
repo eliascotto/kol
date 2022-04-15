@@ -7,6 +7,8 @@
    [reitit.ring.middleware.muuntaja :as muuntaja]
    [reitit.ring.middleware.multipart :as multipart]
    [reitit.ring.middleware.parameters :as parameters]
+   [taoensso.sente :as sente]
+   [kol.socket :as socket]
    [kol.middleware.formats :as formats]
    [ring.util.http-response :refer :all]
    [clojure.java.io :as io]))
@@ -45,18 +47,9 @@
      {:get (swagger-ui/create-swagger-ui-handler
             {:url "/api/swagger.json"
              :config {:validator-url nil}})}]]
-
-   ["/ddoc"
-    {:get {:summary "Get function documentation"
-            :parameters {:query {:symbol string?}}
-            :responses {200 {:body {:doc string?}}}
-            :handler (fn [{{{:keys [symbol]} :body} :parameters}]
-                       {:doc symbol
-                     ;;    (:doc (-> sym
-                     ;;                   symbol
-                     ;;                   var
-                     ;;                   meta))
-                        })}}]
+   
+   ["/chsk" {:get socket/ring-ajax-get-or-ws-handshake
+             :post socket/ring-ajax-post}]
 
    ["/math"
     {:swagger {:tags ["math"]}}

@@ -1,4 +1,4 @@
-(ns kol.comp.molecules.repl-view
+(ns kol.comp.repl.view
   (:require
    [reagent.core :as r]
    [re-frame.core :as rf]
@@ -52,7 +52,6 @@
     (let [repl-input @(rf/subscribe [:repl-input])
           repl-multiline @(rf/subscribe [:repl-multiline])
           repl-placeholder @(rf/subscribe [:repl-placeholder])]
-      (println repl-multiline)
       [with-keybind {:ctrl-c (fn [e]
                                (rf/dispatch [:repl-reset-all])
                                (.preventDefault e))}

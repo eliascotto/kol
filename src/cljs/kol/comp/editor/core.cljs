@@ -1,4 +1,4 @@
-(ns kol.comp.organism.editor
+(ns kol.comp.editor.core
   (:require
    [reagent.core :as r]
    [re-frame.core :as rf]

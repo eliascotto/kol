@@ -1,6 +1,6 @@
-(ns kol.comp.atom.button-add-block
+(ns kol.comp.button.add-block
   (:require
-   [kol.comp.atom.icon :refer [icon]]))
+   [kol.comp.icon.core :refer [icon]]))
 
 (defn button [props]
   [:div {:class ["px-1" "cursor-pointer"

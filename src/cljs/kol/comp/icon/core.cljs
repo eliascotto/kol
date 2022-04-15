@@ -1,4 +1,4 @@
-(ns kol.comp.atom.icon
+(ns kol.comp.icon.core
   (:require
    ["@heroicons/react/solid" :as herosolid]
    ["@heroicons/react/outline" :as herooutline]

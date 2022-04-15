@@ -1,4 +1,5 @@
-(ns kol.definitions)
+(ns kol.definitions
+  "Namespace used to store definition for the Electron FE.")
 
 (def block-colors
   ["bg-slate-900"
@@ -21,7 +22,8 @@
 ;; sexpr the content of the list
 ;; index of the list in the parent
 ;; level is the depth of the list
-(defrecord Block [sexpr index level parent])
+(defrecord Block 
+  [sexpr index level parent])
 
 (comment
   (let [b (Block. '(map 1) 0 0)

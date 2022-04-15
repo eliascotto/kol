@@ -1,4 +1,4 @@
-(ns cljs.kol.comp.atom.dialog
+(ns kol.comp.dialog.core
   (:require
    [re-frame.core :as rf]
    [kol.utils.react :refer [with-keys]]

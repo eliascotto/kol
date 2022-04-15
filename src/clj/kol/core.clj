@@ -1,10 +1,11 @@
 (ns kol.core
   (:require
-   [kol.handler :as handler]
+   [kol.router :as router]
    [nrepl.transport :as transport]
    [kol.nrepl :as nrepl]
    [luminus.http-server :as http]
    [kol.config :refer [env]]
+   [kol.socket]
    [clojure.tools.cli :refer [parse-opts]]
    [clojure.tools.logging :as log]
    [mount.core :as mount])
@@ -26,7 +27,7 @@
   :start
   (http/start
    (-> env
-       (assoc  :handler (handler/app))
+       (assoc  :handler (router/app))
        (update :port #(or (-> env :options :port) %))
        (select-keys [:handler :host :port])))
   :stop
