@@ -5,7 +5,7 @@
 
 (def router_ (atom nil))
 
-(def config {:type :ajax
+(def config {:type :auto
              :packer :edn
              :host "localhost"
              :port "3000"

@@ -1,6 +1,14 @@
 (ns kol.macros)
 
-(defmacro for-indexed [[[i x] coll] & body]
+;; Usage:
+;; (for-indexed [[index item] x]
+;;   ...)
+(defmacro for-indexed 
+  "Macro to use a for loop with indexed items in
+  the form [index item].
+   
+  Usage: `(for-indexed [[index item] x] ...)`"
+  [[[i x] coll] & body]
   `(for [[~i ~x] (map-indexed vector ~coll)] ~@body))
 
 (defmacro rep->
@@ -10,4 +18,18 @@
 
 (comment
   (macroexpand-1 '(rep-> 2 'a 'next))
+  )
+
+(defmacro map-keys
+  "Macro that creates a map with keys the name
+  of the variables inside the vector `coll`. Better
+  use it with named variables."
+  [& args]
+  `(zipmap (map keyword '~args) [~@args]))
+
+(comment
+  (let [a 1 b 2]
+    (map-keys a b)
+    (macroexpand-1 '(map-keys a b))
+    )
   )

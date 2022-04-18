@@ -93,6 +93,36 @@
          (concat blocks
                  (list (sexpr->blk zloc 0 nil))))))))
 
+(defn esxepr->blk
+  "Convert an extended symbolic expression into a block
+   structure."
+  [esexpr]
+  (map
+   (fn [es]
+     (let [sexpr (:sexpr es)]
+       (case (:type es)
+         :list
+         [block es (esxepr->blk (:children es))]
+
+         :vector
+         [wrapper/vector  (esxepr->blk (:children es))]
+
+         :map
+         [wrapper/map (esxepr->blk (mapcat identity (:children es)))]
+
+         :keyword
+         [wrapper/keyword sexpr]
+
+         :symbol
+         [wrapper/symbol (str sexpr)]
+
+         :string
+         [wrapper/string sexpr]
+
+         :number
+         [wrapper/number sexpr])))
+   esexpr))
+
 (defn defn->block
   "Parse a `defn` expr into a block component."
   [sexpr args pos lvl parent]
@@ -118,7 +148,8 @@
      (args->blk (-> args z/right) lvl block-ref)]))
 
 (defn parse-sexpr
-  "Returns the information extracted from the block reference `blk`."
+  "Returns the information extracted from the block 
+  reference `blk`."
   [blk]
   (let [zloc (-> (:sexpr blk)
                  str

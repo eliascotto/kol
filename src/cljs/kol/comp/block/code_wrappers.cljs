@@ -6,38 +6,38 @@
 (def font-size "text-[13px]")
 
 (defn default [x]
-  [:span {:class ["mx-0.5" font-size]}
+  [:div {:class ["inline-block" "mx-0.5" font-size]}
    x])
 
 (defn symbol [s]
-  [:span {:class ["mx-0.5" font-size]}
+  [:div {:class ["inline-block" "mx-0.5" font-size]}
    s])
 
 (defn string [s]
-  [:span {:class ["mx-0.5" font-size "text-[#E7DE79]"]}
+  [:div {:class ["inline-block" "mx-0.5" font-size "text-[#E7DE79]"]}
    (str "\"" s "\"")])
 
 (defn number [s]
-  [:span {:class ["mx-0.5" font-size "text-[#78D1E1]"]}
+  [:div {:class ["inline-block" "mx-0.5" font-size "text-[#78D1E1]"]}
    s])
 
 (defn keyword [s]
-  [:span {:class ["mx-0.5" font-size "text-[#78D1E1]"]}
+  [:div {:class ["inline-block" "mx-0.5" font-size "text-[#78D1E1]"]}
    (str s)])
 
 (defn map [s]
-  [:span {:class ["mx-0.5" font-size]}
+  [:div {:class ["inline-block" "mx-0.5" font-size]}
    "{" s "}"])
 
 (defn vector [x]
-  [:span {:class ["transparent"
-                  "text-[#CCCCCC]"
+  [:div {:class ["inline-block" "transparent"
+                 "text-[#CCCCCC]"
                 ;;  "shadow-md"
                 ;;  "rounded-sm"
                 ;;  "border"
                 ;;  "border-slate-500"
-                  "rounded-md"
-                  "px-1"]}
+                 "rounded-md"
+                 "px-1"]}
 
    "["
    (for-indexed [[index item] x]
@@ -54,15 +54,22 @@
                    item]))
    "]"])
 
+(defn arguments-container [child]
+  [:div {:class ["inline-block"
+                 "transparent"
+                 "text-[#CCCCCC]"
+                 "shadow-md"
+                 "rounded-sm"
+                 "border"
+                 "border-slate-500"
+                 "rounded-md"
+                 "min-h-[17px]"
+                 "min-w-[19.5px]"
+                 "px-1"]}
+   child])
+
 (defn arguments [x]
-  [:span {:class ["transparent"
-                  "text-[#CCCCCC]"
-                  "shadow-md"
-                  "rounded-sm"
-                  "border"
-                  "border-slate-500"
-                  "rounded-md"
-                  "px-1"]}
+  [arguments-container
    (for-indexed [[index item] x]
                 ^{:key (str "vector-opt-" item x)}
                 (let [len (count x)]

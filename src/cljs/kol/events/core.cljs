@@ -5,7 +5,8 @@
    [reitit.frontend.easy :as rfe]
    [reitit.frontend.controllers :as rfc]
    [kol.events.repl]
-   [kol.events.blocks]))
+   [kol.events.blocks]
+   [kol.events.source]))
 
 ;; ----------------------
 ;; Helpers
@@ -32,7 +33,9 @@
     15 \"fizzbuzz\"
     3  \"fizz\"
     5  \"buzz\"
-    n))"})
+    n))"
+   ;; esexpr extracted from server
+   :source-esexpr nil})
 
 ;; ----------------------
 ;; Dispatchers
@@ -88,8 +91,3 @@
  :navigate!
  (fn [_ [_ url-key params query]]
    {:common/navigate-fx! [url-key params query]}))
-
-(rf/reg-event-db
- :source-update
- (fn [db [_ value]]
-   (assoc db :source value)))

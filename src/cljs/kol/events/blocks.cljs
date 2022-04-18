@@ -1,6 +1,7 @@
 (ns kol.events.blocks
   (:require
-   [re-frame.core :as rf]))
+   [re-frame.core :as rf]
+   [day8.re-frame.tracing :refer-macros [fn-traced]]))
 
 (rf/reg-event-db
  :blocks-set-selected
@@ -21,3 +22,4 @@
  :blocks-append-to-list
  (fn [db [_ item]]
    (update-in db [:blocks :list] conj item)))
+

@@ -25,3 +25,9 @@
   "Verify if a symbol is a function on the server."
   [s callback]
   (send-msg! [:fn/doc s] callback))
+
+(defn source->esexpr
+  "Transform a sexpr into an enhanced symbolic expression,
+   on the server."
+  [s callback]
+  (chsk-send! [:ese/parse-source s] 400 callback))

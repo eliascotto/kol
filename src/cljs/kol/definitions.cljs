@@ -12,6 +12,17 @@
    "bg-slate-200"
    "bg-slate-100"])
 
+(def block-borders
+  ["border-slate-900"
+   "border-slate-800"
+   "border-slate-700"
+   "border-slate-600"
+   "border-slate-500"
+   "border-slate-400"
+   "border-slate-300"
+   "border-slate-200"
+   "border-slate-100"])
+
 (comment
   (for [i (range 7)]
     (str "bg-slate-"  (str (- 700 (* i 100))))))
@@ -24,6 +35,9 @@
 ;; level is the depth of the list
 (defrecord Block 
   [sexpr index level parent])
+
+(defrecord ExtBlock
+  [esexpr level parent])
 
 (comment
   (let [b (Block. '(map 1) 0 0)

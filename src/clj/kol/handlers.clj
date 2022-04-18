@@ -36,16 +36,27 @@
   [{:as ev-msg :keys [?data ?reply-fn]}]
   (when (and ?reply-fn ?data)
     (if (symbol? ?data)
-      (?reply-fn (-> ?data utils/sym->meta utils/fn-docs))
+      (?reply-fn (utils/fn-docs ?data))
       (?reply-fn nil))))
 
 (defmethod -event-msg-handler :ese/parse-source
   [{:as ev-msg :keys [?data :?reply-fn]}]
   (when (and ?data ?reply-fn)
-    (?reply-fn (utils/parse-source ?data))))
+    (let [esexpr (utils/source->esexpr ?data)]
+      (?reply-fn esexpr))))
+
+(defmethod -event-msg-handler :example/button2
+  [{:as ev-msg :keys [?reply-fn ?data]}]
+  (when (and ?reply-fn ?data)
+    (?reply-fn '(123))))
+
 
 (comment
   (resolve :mc)
+  (-> #'str
+      meta
+      :ns
+      str)
   (let [s "str"]
     (ns-resolve *ns* (symbol s))
     (symbol s)

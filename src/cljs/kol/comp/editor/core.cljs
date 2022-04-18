@@ -104,7 +104,6 @@
 
       :reagent-render
       (fn []
-        (.log js/console @editor-state)
         [:div {:class ["mb-0"
                        "text-sm"
                        "monospace"

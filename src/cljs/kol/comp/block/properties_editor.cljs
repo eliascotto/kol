@@ -17,9 +17,10 @@
     (str sexpr)))
 
 (def input-style ["bg-slate-700" "outline-none"
-                  "border" "border-slate-600"
+                  "border" "border-slate-700"
                   "focus:border-slate-500"
-                  "text-sm" "rounded-md" "w-full" "px-2" "py-0.5"])
+                  "w-full" "px-1" ;"py-0.5"
+                  "text-[13px]" "font-mono"])
 
 (defn empty-container []
   [:div {:class ["text-slate-600" "h-full" "flex" "items-center"
@@ -66,8 +67,9 @@
         chld-blk (parser/find-child-block blk sexpr)]
     [:div {:class ["bg-slate-700" "flex" "flex-row" "my-1"
                    "items-center" "justify-between" "text-slate-400"
-                   "p-1" "rounded-md" "text-sm" "cursor-pointer"
-                   "hover:text-slate-300"]
+                   "p-1" "rounded-md" "cursor-pointer"
+                   "hover:text-slate-300"
+                   "text-[13px]" "font-mono"]
            :on-click #(rf/dispatch [:blocks-set-selected chld-blk])}
      [:span {:class ["truncate" "pl-1"]}
       (remove-brackets sexpr)]
@@ -237,7 +239,7 @@
 (defn properties-editor []
   (r/with-let [open? (r/atom true)]
     [:div {:class ["flex" "flex-row" "bg-slate-800"
-                   (when @open? "w-[19.5rem]")]}
+                   (when @open? "w-[16.5rem]")]}
      [:div {:class ["h-full" "w-0.5"
                     "hover:bg-blue-600" "cursor-ew-resize"]
             :on-click #(swap! open? not)}]

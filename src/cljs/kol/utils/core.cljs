@@ -10,6 +10,12 @@
   [evt]
   (-> evt .-target .-value))
 
+(defn stop-propagation
+  "Stop event propagation."
+  [evt]
+  (.preventDefault evt)
+  (.stopPropagation evt))
+
 (defn in?
   "Returns true if `coll` contains `el`."
   [coll el]

@@ -5,11 +5,10 @@
    [kol.comp.block.properties-editor :refer [properties-editor]]))
 
 (defn create-page []
-  (let [source @(rf/subscribe [:source])]
-    [:div {:class ["flex" "flex-row" "w-full"]
-           :style {:height "calc(100vh - 2rem)"}}
+  [:div {:class ["flex" "flex-row" "w-full"]
+         :style {:height "calc(100vh - 2rem)"}}
      ;; Blocks bar
-     [:div {:class ["flex-1" "bg-slate-600"]}
-      [workspace source]]
+   [:div {:class ["flex-1" "bg-slate-600"]}
+    [workspace]]
      ;; Parameters bar
-     [properties-editor]]))
+   [properties-editor]])
