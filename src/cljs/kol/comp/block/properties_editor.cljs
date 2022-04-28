@@ -29,8 +29,8 @@
 
 (defn type-select [selected]
   [:select {:name "type-select"
-            :class ["bg-slate-700" "rounded-md" "w-full" "outline-none"
-                    "text-slate-400" "p-1" "mb-2"]}
+            :class ["bg-slate-700" "rounded-md" "w-full" 
+                    "outline-none" "text-slate-400" "p-1" "mb-2"]}
    (for [t defs/block-types]
      [:option
       {:selected (= (:type t) selected)
@@ -58,9 +58,10 @@
         [:div {:class ["w-full" "flex" "flex-col" "items-center"]}
          (when @open?
            (:extended opts))
-         [icon (if @open? "chevron-up" "chevron-down")
-          {:class ["w-3" "text-slate-600" "m-auto" "cursor-pointer"]
-           :on-click #(swap! open? not)}]])])))
+         [icon {:class ["w-3" "text-slate-600"
+                        "m-auto" "cursor-pointer"]
+                :on-click #(swap! open? not)}
+          (if @open? "chevron-up" "chevron-down")]])])))
 
 (defn go-to-block-btn [sexpr]
   (let [blk @(rf/subscribe [:blocks-selected])
@@ -74,8 +75,8 @@
      [:span {:class ["truncate" "pl-1"]}
       (remove-brackets sexpr)]
      [:div {:class ["h-5"]}
-      [icon "chevron-right"
-       {:class ["w-5" "h-auto" "ml-4"]}]]]))
+      [icon {:class ["w-5" "h-auto" "ml-4"]}]
+      "chevron-right"]]))
 
 (defn argument-type-icon
   ([s]

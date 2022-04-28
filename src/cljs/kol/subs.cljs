@@ -74,7 +74,6 @@
 
 (def-sub :source-esexpr)
 
-
 (rf/reg-sub
  :blocks
  (fn [db _]

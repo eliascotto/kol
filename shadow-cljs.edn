@@ -9,10 +9,16 @@
    :asset-path       "/js"
    :modules          {:app {:entries [kol.app]}}
    :devtools         {:watch-dir "resources/public"
-                      :preloads  [re-frisk.preload]}
+                      :preloads  [day8.re-frame-10x.preload
+                                  devtools.preload]}
    :compiler-options {:output-feature-set :es-next}
+   :js-options       {:resolve
+                      {"one-dark" {:target :file
+                                   :file "src/js/one-dark.js"}}}
    :dev              {:closure-defines
-                      {"re_frame.trace.trace_enabled_QMARK_" true}}
+                      {"re_frame.trace.trace_enabled_QMARK_" true
+                       day8.re-frame.tracing.trace-enabled? true
+                       kol.env/DEBUG true}}
    :release          {}}
 
   ;; frontend electron
@@ -22,10 +28,9 @@
    :asset-path       "/js"
    :modules          {:app {:entries [kol.app]}}
    :devtools         {:watch-dir "resources/public"
-                      :preloads  [re-frisk-remote.preload
-                                  day8.re-frame-10x.preload]}
-   :compiler-options {:output-feature-set :es-next
-                      :reader-features #{:electron}}
+                      :preloads  [day8.re-frame-10x.preload
+                                  devtools.preload]}
+   :compiler-options {:output-feature-set :es-next}
    :js-options       {:resolve
                       {"one-dark" {:target :file
                                    :file "src/js/one-dark.js"}}}
@@ -40,8 +45,7 @@
   {:target           :node-script
    :output-to        "resources/main.js"
    :main             kol.main.core/main
-   :compiler-options {:output-feature-set :es-next
-                      :reader-features #{:electron}}}
+   :compiler-options {:output-feature-set :es-next}}
 
   :test
   {:target    :node-test

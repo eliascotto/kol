@@ -48,7 +48,8 @@
     (write-repl in :input)))
 
 (defn- eval-input [in]
-  (.eval (.-electronAPI js/window) in))
+  (when-let [api (.-electronAPI js/window)]
+    (.eval api in)))
 
 (defn- reset-repl-input
   "Clear the REPL input."
@@ -122,8 +123,8 @@
 
     :component-did-mount
     (fn []
-      (-> (.-electronAPI js/window)
-          (.handleResponse handle-repl-response)))
+      (when-let [api (.-electronAPI js/window)]
+        (.handleResponse api handle-repl-response)))
 
     :reagent-render
     (fn []

@@ -6,7 +6,8 @@
    [reitit.frontend.controllers :as rfc]
    [kol.events.repl]
    [kol.events.blocks]
-   [kol.events.source]))
+   [kol.events.source]
+   [kol.fn.esexpr :as esexpr]))
 
 ;; ----------------------
 ;; Helpers
@@ -33,7 +34,9 @@
     15 \"fizzbuzz\"
     3  \"fizz\"
     5  \"buzz\"
-    n))"
+    n))
+  
+()"
    ;; esexpr extracted from server
    :source-esexpr nil})
 
@@ -85,7 +88,8 @@
 (rf/reg-fx
  :common/navigate-fx!
  (fn [[k & [params query]]]
-   (rfe/push-state k params query)))
+   (try (rfe/push-state k params query)
+        (catch js/Error e (println "Error HERE!!!!")))))
 
 (rf/reg-event-fx
  :navigate!

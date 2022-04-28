@@ -17,7 +17,8 @@
    [kol.comp.navbar.core :refer [navbar]]
    [reitit.core :as reitit]
    [reitit.frontend.easy :as rfe]
-   [clojure.string :as string])
+   [clojure.string :as string]
+   [kol.fn.esexpr :as esexpr])
   (:import goog.History))
 
 (defn about-page []
@@ -71,4 +72,5 @@
   (socket/start!)
   (ajax/load-interceptors!)
   (mount-components)
-  (rf/dispatch-sync [:initialize-db]))
+  (rf/dispatch-sync [:initialize-db])
+  (esexpr/fetch))

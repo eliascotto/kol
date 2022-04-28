@@ -15,7 +15,7 @@
 
 (defn string [s]
   [:div {:class ["inline-block" "mx-0.5" font-size "text-[#E7DE79]"]}
-   (str "\"" s "\"")])
+   (str s)])
 
 (defn number [s]
   [:div {:class ["inline-block" "mx-0.5" font-size "text-[#78D1E1]"]}
@@ -38,7 +38,6 @@
                 ;;  "border-slate-500"
                  "rounded-md"
                  "px-1"]}
-
    "["
    (for-indexed [[index item] x]
                 ^{:key (str "vector-opt-" item x)}

@@ -18,6 +18,13 @@ html, body, #app {
     @apply bg-slate-700
            rounded-none;
   }
+
+  [contenteditable=true]:empty:before{
+    content: attr(placeholder);
+    pointer-events: none;
+    @apply italic
+           text-slate-400;
+  }
 }
 
 @layer utilities {

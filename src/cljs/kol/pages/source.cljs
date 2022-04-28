@@ -4,9 +4,10 @@
    [kol.comp.editor.core :refer [editor]]))
 
 (defn source-page []
-  [:div {:class ["flex" "flex-row"
-                 "h-full" "w-full"
-                 "overflow-hidden"]}
+  [:div {:class ["flex" "flex-row" "w-full"
+                 "overflow-hidden"
+                 "bg-gray-900"]
+         :style {:height "calc(100vh - 2rem)"}}
    ;; Editor
    [:div {:class ["flex-1"
                   "border-r"

@@ -1,7 +1,8 @@
 (ns kol.handlers
   (:require
    [clojure.tools.logging :as log]
-   [kol.utils :as utils]))
+   [kol.utils.core :as utils]
+   [kol.utils.esexpr :as esexpr]))
 
 (defmulti -event-msg-handler
   "Multimethod to handle Sente `event-msg`s"
@@ -39,17 +40,32 @@
       (?reply-fn (utils/fn-docs ?data))
       (?reply-fn nil))))
 
-(defmethod -event-msg-handler :ese/parse-source
+(defmethod -event-msg-handler :chsk/ws-ping
+  [{:as ev-msg :keys [?reply-fn]}]
+  (when ?reply-fn
+    (?reply-fn "pong")))
+
+;;/////////////////
+;; Expr
+;;/////////////////
+
+(defmethod -event-msg-handler :expr/parse-source
   [{:as ev-msg :keys [?data :?reply-fn]}]
   (when (and ?data ?reply-fn)
-    (let [esexpr (utils/source->esexpr ?data)]
+    (let [esexpr (esexpr/source->esexpr ?data)]
       (?reply-fn esexpr))))
 
-(defmethod -event-msg-handler :example/button2
-  [{:as ev-msg :keys [?reply-fn ?data]}]
-  (when (and ?reply-fn ?data)
-    (?reply-fn '(123))))
+(defmethod -event-msg-handler :expr/update-expr
+  [{:as ev-msg :keys [?data :?reply-fn]}]
+  (when (and ?data ?reply-fn)
+    (let [resp (esexpr/update-expr ?data)]
+      (?reply-fn resp))))
 
+(defmethod -event-msg-handler :expr/add-block
+  [{:as ev-msg :keys [?data :?reply-fn]}]
+  (when (and ?data ?reply-fn)
+    (let [resp (esexpr/add-block ?data)]
+      (?reply-fn resp))))
 
 (comment
   (resolve :mc)

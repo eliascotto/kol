@@ -5,11 +5,12 @@
 
 (defn page-item [page selected?]
   [:div {:class ["px-2" "py-0.5" "text-gray-400" "font-medium"
-                 "cursor-pointer" "z-10"
+                 "cursor-pointer" "z-10" "select-none"
                  (when selected?
                    "border-b border-slate-400")]
          :style {:WebkitAppRegion "no-drag"}
-         :on-click #(rf/dispatch [:navigate! page])}
+         :on-click (fn []
+                     (rf/dispatch [:navigate! page]))}
    (-> page
        name
        string/capitalize)])
@@ -26,8 +27,7 @@
                    "sticky"
                    "top-0"
                    "bg-slate-800"]
-           :style {:WebkitUserSelect "none"
-                   :WebkitAppRegion "drag"}}
+           :style {:WebkitAppRegion "drag"}}
      [:div {:class ["flex" "flex-row" "items-center" "justify-center"
                     "text-xs" "text-slate-400"
                     "w-4" "h-4"]

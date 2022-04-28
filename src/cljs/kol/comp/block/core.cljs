@@ -8,8 +8,8 @@
    [kol.utils.sexpr :as sexpr]
    [kol.macros :refer [for-indexed map-keys]]
    [kol.comp.block.code-wrappers :as wrapper]
-   [kol.comp.block.common :refer [block-pre block-fun]]
-   [kol.comp.block.input :refer [block-input]]))
+   [kol.comp.block.common :refer [expr-el-def expr-el-fn]]
+   [kol.comp.block.input :refer [expr-input]]))
 
 (defn block-bg-color
   "Return a string of the background class for the block."
@@ -61,21 +61,22 @@
   [:div {:class ["grid"]
          :style {:grid-template-columns "min-content 1fr"}}
    (for-indexed [[idx a] args]
-                [:div {:class ["overflow-hidden" "px-1" (when (even? idx) "pl-0")]}
+                ^{:key (str "table-arg-" idx a)}
+                [:div {:class ["overflow-hidden" "px-1" 
+                               (when (even? idx) "pl-0")]}
                  a])])
 
 (defn block-header [{:keys [fun pre post child]}]
-  [:div {:class ["px-1" "py-0.5"
-                 "flex" "flex-row"
-                 "items-start" "justify-start"]}
-   (when pre [block-pre pre])
-   (when fun [block-fun fun pre])
+  [:div {:class ["px-1" "flex" "flex-row"
+                (if pre "items-center" "items-start") "justify-start"]}
+   (when pre [expr-el-def pre])
+   (when fun [expr-el-fn fun pre])
    (when post
      [:div {:class [(when fun "pl-2")]}
       post])
    (when child
      [:div {:class ["text-xs" "flex" "flex-row" "items-center"
-                    "space-x-1" "px-1" "leading-[19.5px]"]}
+                    "px-1" "leading-[19.5px]"]}
       child])])
 
 (defn block-el
@@ -89,20 +90,21 @@
     [:div {:class [bg-color "text-slate-200"
                    "w-fit" "min-w-[90px]"
                    "shadow-md" "rounded-md"
-                   "px-1" (when args "py-1") "my-1"
-                   "font-mono" "font-normal" "text-[13px]"
-                   "border"
+                   "px-1.5" (when args "py-1") "my-1"
+                   "font-mono" "font-normal" "text-[13px]" "border"
                    (str "border-slate-" (if selected?
                                           400
                                           (if (zero? lvl) 700 800)))]
            :on-click #(on-block-click % esexpr)}
      (if (empty? (:sexpr esexpr))
-       [block-input]
+       ;; if empty use edit block
+       [expr-input esexpr]
+       ;; otherwhise display block
        [:div {:class ["flex" (if indent-args? "flex-row" "flex-col")]}
         ;; Header
         header
         ;; Content
-        [:div {:class ["px-1" "flex" "flex-col" "items-start"]}
+        [:div {:class ["flex" "flex-col" "items-start"]}
          (if (args-even? fun)
            ;; Args grid for event arguments
            [table-args newline-args]
@@ -115,16 +117,15 @@
         fun-call? (every? #(not= % fun) ['def 'defn 'fn])
         args (extract-args args fun fun-call?)
         parsed-args (calc-inline-args fun args fun-call?)
-        [inline-args _] parsed-args]
-    [block-el
-     (merge (map-keys esexpr fun lvl fun-call? args parsed-args)
-            {:header
-             [block-header
-              (if fun-call?
-                {:fun fun
-                 :child inline-args}
-                (let [sexpr (:sexpr esexpr)
-                      fn-args (nth sexpr 2)]
-                  {:pre (if (= fun 'defn) "function" "fn")
-                   :fun (second sexpr)
-                   :post [wrapper/arguments fn-args]}))]})]))
+        [inline-args _] parsed-args
+        base-args (map-keys esexpr fun lvl fun-call? args parsed-args)
+        header-props (if fun-call?
+                         {:fun fun
+                          :child inline-args}
+                         (let [sexpr (:sexpr esexpr)
+                               fn-args (nth sexpr 2)]
+                           {:pre (if (= fun 'defn) "function" "fn")
+                            :fun (second sexpr)
+                            :post [wrapper/arguments fn-args]}))]
+    [block-el (merge base-args 
+                     {:header [block-header header-props]})]))

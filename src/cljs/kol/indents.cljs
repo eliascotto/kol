@@ -1,15 +1,15 @@
 (ns kol.indents)
 
 (def indents
-  {'alt!            {:block 0}
-   'alt!!           {:block 0}
+  {;;  'alt!            {:block 0}
+  ;;  'alt!!           {:block 0}
    'are             {:block 2}
    'as->            {:block 2}
    'binding         {:block 1}
    'case            {:block 1 :even true}
    'catch           {:block 2}
-   'comment         {:block 0}
-   'cond            {:block 0}
+  ;;  'comment         {:block 0}
+  ;;  'cond            {:block 0}
    'condp           {:block 2 :even true}
    'cond->          {:block 1}
    'cond->>         {:block 1}
@@ -18,17 +18,17 @@
    'defrecord       {:block 2}
    'defstruct       {:block 1}
    'deftype         {:block 2}
-   'do              {:block 0}
+  ;;  'do              {:block 0}
    'doseq           {:block 1}
    'dotimes         {:block 1}
    'doto            {:block 1}
    'extend          {:block 1}
    'extend-protocol {:block 1}
    'extend-type     {:block 1}
-   'finally         {:block 0}
+  ;;  'finally         {:block 0}
    'for             {:block 1}
-   'future          {:block 0}
-   'go              {:block 0}
+  ;;  'future          {:block 0}
+  ;;  'go              {:block 0}
    'go-loop         {:block 1}
    'if              {:block 1}
    'if-let          {:block 1}
@@ -43,8 +43,8 @@
    'proxy           {:block 2}
    'struct-map      {:block 1}
    'testing         {:block 1}
-   'thread          {:block 0}
-   'try             {:block 0}
+  ;;  'thread          {:block 0}
+  ;;  'try             {:block 0}
    'when            {:block 1}
    'when-first      {:block 1}
    'when-let        {:block 1}
@@ -53,6 +53,6 @@
    'while           {:block 1}
    'with-local-vars {:block 1}
    'with-open       {:block 1}
-   'with-out-str    {:block 0}
+  ;;  'with-out-str    {:block 0}
    'with-precision  {:block 1}
    'with-redefs     {:block 1}})

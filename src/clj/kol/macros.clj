@@ -12,24 +12,24 @@
   `(for [[~i ~x] (map-indexed vector ~coll)] ~@body))
 
 (defmacro rep->
-  "Apply `form` to `x`, `n` times, using a `->` macro."
+  "Apply `form` to `x`, `n` times, using thread macro `->`."
   [n x form]
   `(-> ~x ~@(repeat n form)))
 
 (comment
-  (macroexpand-1 '(rep-> 2 'a 'next))
+  (macroexpand-1 '(rep-> 2 'a 'next)) ; => (clojure.core/-> 'a 'next 'next)
   )
 
 (defmacro map-keys
   "Macro that creates a map with keys the name
   of the variables inside the vector `coll`. Better
-  use it with named variables."
+  used with named variables."
   [& args]
   `(zipmap (map keyword '~args) [~@args]))
 
 (comment
   (let [a 1 b 2]
-    (map-keys a b)
-    (macroexpand-1 '(map-keys a b))
+    (map-keys a b) ; => {:a 1, :b 2}
+    ;; (macroexpand-1 '(map-keys a b))
     )
   )

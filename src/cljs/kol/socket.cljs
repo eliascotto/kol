@@ -1,7 +1,8 @@
 (ns kol.socket
   (:require
    [taoensso.sente :as sente]
-   [kol.handlers :as handlers]))
+   [kol.handlers :as handlers]
+   [kol.utils.log :as log]))
 
 (def router_ (atom nil))
 
@@ -12,7 +13,7 @@
              :protocol "http:"})
 
 (defn state-watcher [_key _atom _old-state new-state]
-  (.warn js/console "New state" new-state))
+  (log/warn "New state" new-state))
 
 (let [{:keys [chsk ch-recv send-fn state]}
       (sente/make-channel-socket-client! "/api/chsk" nil config)]

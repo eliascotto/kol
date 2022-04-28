@@ -2,8 +2,7 @@
   (:require
     [kol.core :as core]
     [cljs.spec.alpha :as s]
-    [expound.alpha :as expound]
-    [devtools.core :as devtools]))
+    [expound.alpha :as expound]))
 
 (extend-protocol IPrintWithWriter
   js/Symbol
@@ -13,7 +12,5 @@
 (set! s/*explain-out* expound/printer)
 
 (enable-console-print!)
-
-(devtools/install!)
 
 (core/init!)

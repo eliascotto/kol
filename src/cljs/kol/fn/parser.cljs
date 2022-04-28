@@ -2,96 +2,10 @@
   (:require
    [re-frame.core :as rf]
    [rewrite-clj.zip :as z]
+   [kol.utils.log :as log]
    [kol.comp.block.core :refer [block]]
    [kol.comp.block.code-wrappers :as wrapper]
-   [kol.definitions :refer [Block]]))
-
-(declare sexpr->blk
-         defn->block
-         fn->block)
-
-(defn create-block-ref
-  "Create a new block record, used to modifiy the 
-  content of the block."
-  [sexpr pos lvl parent]
-  (Block. sexpr pos lvl parent))
-
-(defn push-block-ref! [blk]
-  (rf/dispatch [:blocks-append-to-list blk]))
-
-(defn args->blk
-  "Translate arguments to block/wrapper depending
-  on the sexpr type.
-  `zip` is a "
-  [zip lvl parent]
-  (loop [zloc zip
-         args ()]
-    (if (z/end? zloc)
-      args
-      (let [sexpr (z/sexpr zloc)
-            node (cond
-                   (list? sexpr)
-                   (sexpr->blk zloc (inc lvl) parent)
-
-                   (vector? sexpr)
-                   [wrapper/vector
-                    (args->blk (z/next zloc) lvl parent)]
-
-                   (map? sexpr)
-                   [wrapper/map
-                    (args->blk (z/next zloc) lvl parent)]
-
-                   (keyword? sexpr)
-                   [wrapper/keyword sexpr]
-
-                   (symbol? sexpr)
-                   [wrapper/symbol (str sexpr)]
-
-                   (string? sexpr)
-                   [wrapper/string sexpr]
-
-                   (number? sexpr)
-                   [wrapper/number sexpr])]
-        (recur
-         (z/right zloc)
-         (concat args (list node)))))))
-
-(defn sexpr->blk
-  "Convert a sexpr to a hiccup block with opts and
-  args."
-  [zloc lvl parent]
-  (if (z/list? zloc)
-    (let [f (-> zloc z/next z/sexpr)
-          args (-> zloc z/next z/right)
-          sexpr (z/sexpr zloc)
-          ;; Save block position
-          pos (z/position zloc)]
-      ^{:key (str "block-" sexpr)}
-      (case f
-        defn (defn->block sexpr args pos lvl parent)
-        fn (fn->block sexpr args pos lvl parent)
-        ;; default
-        (let [block-ref (create-block-ref sexpr pos lvl parent)
-              _ (push-block-ref! block-ref)]
-          [block {:func (str f)}
-           block-ref
-           (args->blk args lvl block-ref)])))
-    (args->blk zloc 0 parent)))
-
-(defn src->blk
-  "Convert a list of sexprs to block components.
-  `src` is a string containing Clojure source code."
-  [src]
-  (rf/dispatch [:blocks-reset-list])
-  (let [zip (z/of-string src {:track-position? true})]
-    (loop [zloc zip
-           blocks ()]
-      (if (z/end? zloc)
-        blocks
-        (recur
-         (z/right zloc)
-         (concat blocks
-                 (list (sexpr->blk zloc 0 nil))))))))
+   [kol.comp.block.common :as common]))
 
 (defn esxepr->blk
   "Convert an extended symbolic expression into a block
@@ -105,47 +19,26 @@
          [block es (esxepr->blk (:children es))]
 
          :vector
-         [wrapper/vector  (esxepr->blk (:children es))]
+         [wrapper/vector (esxepr->blk (:children es))]
 
          :map
-         [wrapper/map (esxepr->blk (mapcat identity (:children es)))]
+         [wrapper/map (esxepr->blk (:children es))]
 
          :keyword
-         [wrapper/keyword sexpr]
+         [common/expr-el [wrapper/keyword sexpr]]
 
          :symbol
          [wrapper/symbol (str sexpr)]
 
          :string
-         [wrapper/string sexpr]
+         [wrapper/string (str "\"" sexpr "\"")]
 
          :number
-         [wrapper/number sexpr])))
+         [common/expr-el [wrapper/number sexpr]]
+
+         (do (log/error "SEXPR unknown type: " (:type es))
+             (println (pr-str es))))))
    esexpr))
-
-(defn defn->block
-  "Parse a `defn` expr into a block component."
-  [sexpr args pos lvl parent]
-  (let [fn-name (z/sexpr args)
-        fn-args (-> args z/right z/sexpr)
-        block-ref (create-block-ref sexpr pos lvl parent)
-        _ (push-block-ref! block-ref)]
-    [block {:pre "function"
-            :func fn-name
-            :post [wrapper/arguments fn-args]}
-     block-ref
-     (args->blk (-> args z/right z/right) lvl block-ref)]))
-
-(defn fn->block
-  "Parse a `fn` expr into a block component."
-  [sexpr args pos lvl parent]
-  (let [fn-args (-> args z/sexpr)
-        block-ref (create-block-ref sexpr pos lvl parent)
-        _ (push-block-ref! block-ref)]
-    [block {:pre "fn"
-            :post [wrapper/arguments fn-args]}
-     block-ref
-     (args->blk (-> args z/right) lvl block-ref)]))
 
 (defn parse-sexpr
   "Returns the information extracted from the block 

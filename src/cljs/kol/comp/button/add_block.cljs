@@ -7,6 +7,6 @@
                  "text-neutral-500"
                  "hover:text-neutral-300"]
          :title "Add a new block"}
-   [icon "plus"
-    {:class ["w-3" "h-3"]
-     :on-click (:on-click props)}]])
+   [icon {:class ["w-3" "h-3"]
+          :on-click (:on-click props)}
+    "plus"]])

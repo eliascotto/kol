@@ -5,3 +5,6 @@
 
 (def debug
   (.-log js/console))
+
+(def warn
+  (.-warn js/console))

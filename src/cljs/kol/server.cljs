@@ -3,7 +3,8 @@
   (:require
    [taoensso.sente :as sente]
    [kol.socket :as socket :refer [chsk-send!]]
-   [kol.utils.log :as log]))
+   [kol.utils.log :as log]
+   [kol.macros :refer [map-keys]]))
 
 (defn- handle-error [event reply]
   (log/error (str "Error in ws request: " event)
@@ -30,4 +31,16 @@
   "Transform a sexpr into an enhanced symbolic expression,
    on the server."
   [s callback]
-  (chsk-send! [:ese/parse-source s] 400 callback))
+  (send-msg! [:expr/parse-source s] callback))
+
+(defn update-expr
+  "Transform a sexpr into an enhanced symbolic expression,
+   on the server."
+  [source node expr callback]
+  (-> [:expr/update-expr (map-keys source node expr)]
+      (send-msg! callback)))
+
+(defn add-block
+  "Add a new block."
+  [source callback]
+  (send-msg! [:expr/add-block source] callback))
