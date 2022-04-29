@@ -4,7 +4,7 @@
 
 ;; Source 
 ;; https://javascript.plainenglish.io/how-to-find-the-caret-inside-a-contenteditable-element-955a5ad9bf81
-(defn caret-index
+(defn get-caret-index
   "Returns the index of the caret inside the 
   element `el`."
   [el]
@@ -34,23 +34,18 @@
       (when (instance? js/HTMLElement el)
         (.focus el)))))
 
-(defn emit-change [component last-html set-last props]
+(defn emit-change [component on-change]
   (let [html (-> (.-innerHTML component)
                  ;; Remove non-breaking space
                  (.replace "&nbsp;" ""))]
-    ;; Emit change only if html content has changed
-    (when (and (:on-change props) (not= last-html html))
-      ((:on-change props) {:html html
-                           :value (.-innerText component)}))
-    (set-last html)))
+    (on-change {:html html
+                :value (.-innerText component)})))
 
 (defn content-editable
   "Editable div with props `value`, `placeholder`, `class`
   and events `on-change`, `on-blur`, `on-key-down`."
   [props]
-  (r/with-let [div-ref (r/atom nil)
-               last-html (r/atom nil)
-               set-last #(reset! last-html %)]
+  (r/with-let [div-ref (r/atom nil)]
     (let [ref (if (contains? props :ref) (:ref props) div-ref)
           get-el #(deref ref)]
       (r/create-class
@@ -73,10 +68,7 @@
         (fn [props]
           [:div {:class (:class props)
                  :ref #(reset! ref %)
-                 :on-input #(emit-change (get-el)
-                                         @last-html
-                                         set-last
-                                         props)
+                 :on-input #(emit-change (get-el) (:on-change props))
                  :on-blur (:on-blur props)
                  :on-key-down (:on-key-down props)
                  :placeholder (:placeholder props)

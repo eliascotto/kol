@@ -7,6 +7,7 @@
    [kol.events.repl]
    [kol.events.blocks]
    [kol.events.source]
+   [kol.events.sexpr]
    [kol.fn.esexpr :as esexpr]))
 
 ;; ----------------------
@@ -26,8 +27,7 @@
                :value "Clojure REPL v1.0"}]}
    ;; Current edited block
    :blocks
-   {:selected nil
-    :list []}
+   {:selected nil}
    ;; Current file source
    :source "(defn fizz-buzz [n]
   (case n

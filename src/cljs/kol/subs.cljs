@@ -74,6 +74,10 @@
 
 (def-sub :source-esexpr)
 
+;;
+;; BLOCKS
+;;
+
 (rf/reg-sub
  :blocks
  (fn [db _]
@@ -90,3 +94,36 @@
  :<- [:blocks]
  (fn [blocks _]
    (:list blocks)))
+
+;;
+;; BLOCK
+;;
+
+(rf/reg-sub
+ :block
+ (fn [db _]
+   (-> db :block)))
+
+(rf/reg-sub
+ :sexpr-list
+ :<- [:block]
+ (fn [block _]
+   (:sexpr-list block)))
+
+(rf/reg-sub
+ :sexpr-first
+ :<- [:block]
+ (fn [block _]
+   (first (:sexpr-list block))))
+
+(rf/reg-sub
+ :sexpr-input-value
+ :<- [:block]
+ (fn [block _]
+   (:input block)))
+
+(rf/reg-sub
+ :sexpr-input-string?
+ :<- [:block]
+ (fn [block _]
+   (:input-string? block)))

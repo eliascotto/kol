@@ -9,7 +9,7 @@
    [kol.macros :refer [for-indexed map-keys]]
    [kol.comp.block.code-wrappers :as wrapper]
    [kol.comp.block.common :refer [expr-el-def expr-el-fn]]
-   [kol.comp.block.input :refer [expr-input]]))
+   [kol.comp.block.input :refer [block-input]]))
 
 (defn block-bg-color
   "Return a string of the background class for the block."
@@ -98,7 +98,7 @@
            :on-click #(on-block-click % esexpr)}
      (if (empty? (:sexpr esexpr))
        ;; if empty use edit block
-       [expr-input esexpr]
+       [block-input esexpr]
        ;; otherwhise display block
        [:div {:class ["flex" (if indent-args? "flex-row" "flex-col")]}
         ;; Header
