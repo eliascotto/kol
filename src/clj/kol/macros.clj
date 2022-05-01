@@ -3,7 +3,7 @@
 ;; Usage:
 ;; (for-indexed [[index item] x]
 ;;   ...)
-(defmacro for-indexed 
+(defmacro for-indexed
   "Macro to use a for loop with indexed items in
   the form [index item].
    
@@ -31,5 +31,4 @@
   (let [a 1 b 2]
     (map-keys a b) ; => {:a 1, :b 2}
     ;; (macroexpand-1 '(map-keys a b))
-    )
-  )
+    ))

@@ -33,7 +33,7 @@
   (let [clicks (.-details e)]
     (if (> clicks 1)
       ()
-      (rf/dispatch [:blocks-set-selected esexpr]))))
+      (rf/dispatch [:set-selected-block esexpr]))))
 
 (defn calc-inline-args [func args fn-call?]
   (let [inline-count (inline-args-count func)

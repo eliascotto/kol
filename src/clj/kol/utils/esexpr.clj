@@ -8,35 +8,38 @@
 (defn parse-expr
   "Parse an expression rapresented by an atom or a sexpr."
   [zloc loc]
-  (let [sexpr (z/sexpr zloc)
-        common {:sexpr sexpr
-                :position (z/position zloc)
-                :tag (z/tag zloc)}
-        with-type #(merge common {:type %})
-        with-child (fn [sexpr]
-                     (when-not (empty? sexpr)
-                       {:children (parse-sexpr (z/next zloc) loc)}))]
-    (cond
-      (symbol? sexpr) (let [base (with-type :symbol)
-                            docs (fn-ext-meta sexpr)]
-                        (if docs (merge base docs) base))
+  (if (= (z/tag zloc) :newline)
+    {:newlines (count (z/string zloc))}
+    (when-not (z/whitespace? zloc)
+      (let [sexpr (z/sexpr zloc)
+            common {:sexpr sexpr
+                    :position (z/position zloc)
+                    :tag (z/tag zloc)}
+            with-type #(merge common {:type %})
+            with-child (fn [sexpr]
+                         (when-not (empty? sexpr)
+                           {:children (parse-sexpr (z/next zloc) loc)}))]
+        (cond
+          (symbol? sexpr) (let [base (with-type :symbol)
+                                docs (fn-ext-meta sexpr)]
+                            (if docs (merge base docs) base))
 
-      (list? sexpr)   (merge (with-type :list)
-                             {:location loc}
-                             (with-child sexpr))
+          (list? sexpr)   (merge (with-type :list)
+                                 {:location loc}
+                                 (with-child sexpr))
 
-      (vector? sexpr) (merge (with-type :vector)
-                             (with-child sexpr))
+          (vector? sexpr) (merge (with-type :vector)
+                                 (with-child sexpr))
 
-      (map? sexpr)    (merge (with-type :map)
-                             (with-child sexpr))
+          (map? sexpr)    (merge (with-type :map)
+                                 (with-child sexpr))
 
-      (keyword? sexpr) (with-type :keyword)
-      (number? sexpr)  (with-type :number)
-      (string? sexpr)  (with-type :string)
+          (keyword? sexpr) (with-type :keyword)
+          (number? sexpr)  (with-type :number)
+          (string? sexpr)  (with-type :string)
 
-      :else {:type (type sexpr)
-             :sexpr sexpr})))
+          :else {:type (type sexpr)
+                 :sexpr sexpr})))))
 
 ;; Location represent the index of the list inside
 ;; the structure. Every level of depth is a new entry in
@@ -50,18 +53,27 @@
 ;;         b (+ 2 3)] ;=> (+ 2 3) has location [1 1 2]
 ;;      (+ a b))) ;=> (+ a b) has location [1 1 3] 
 (defn parse-sexpr
-  "Parse a symbolic expression `()` - the content of a list."
+  "Parse a symbolic expression `()` - the content of a list,
+  including new lines."
   [zip loc]
   (loop [zloc zip
          ast  ()
          idx  0]
     (if (z/end? zloc)
       (reverse ast)
-      (let [l? (z/list? zloc)]
-        (recur (z/right zloc)
-               (conj ast (parse-expr zloc
-                                     (if l? (conj loc idx) loc)))
+      (let [l? (z/list? zloc)
+            new-loc (if l? (conj loc idx) loc)]
+        (recur (z/right* zloc)
+               (if-let [ext (parse-expr zloc new-loc)]
+                 (conj ast ext)
+                 ast)
                (if l? (inc idx) idx))))))
+
+(comment
+  (source->esexpr
+   "(defn fizz-buzz [n]
+   n)\n\n()")
+  )
 
 (defn source->esexpr
   "Returns an extended-symbolic-expression extracted from sources."
@@ -109,7 +121,7 @@
     :node {:sexpr (), :position [1 25], :tag :list, :type :list, :location [1]}
     :expr '(defn undef [] nil)})
   (source->esexpr
-   "(defn fizz-buzz (n) n)  ()")
+   "(defn fizz-buzz [n] n)\n\n()")
   (let [s (str "(defn fizz-buzz (n) n)  ()")]
     (-> s
         (z/of-string {:track-position? true})
@@ -147,3 +159,6 @@
       z/of-string
       z/next
       z/right*))
+
+(comment
+  (z/of-string "{:a 1}"))

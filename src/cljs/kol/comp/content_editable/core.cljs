@@ -65,12 +65,14 @@
               (replace-caret (get-el)))))
 
         :reagent-render
-        (fn [props]
-          [:div {:class (:class props)
+        (fn [{:keys [value class placeholder on-change on-focus 
+                     on-blur on-key-down]}]
+          [:div {:class class
                  :ref #(reset! ref %)
-                 :on-input #(emit-change (get-el) (:on-change props))
-                 :on-blur (:on-blur props)
-                 :on-key-down (:on-key-down props)
-                 :placeholder (:placeholder props)
+                 :on-input #(emit-change (get-el) on-change)
+                 :on-focus on-focus
+                 :on-blur on-blur
+                 :on-key-down on-key-down
+                 :placeholder placeholder
                  :contentEditable true
-                 :dangerouslySetInnerHTML {:__html (:value props)}}])}))))
+                 :dangerouslySetInnerHTML {:__html value}}])}))))

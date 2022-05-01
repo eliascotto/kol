@@ -7,13 +7,14 @@
    [kol.comp.icon.core :refer [icon]]))
 
 (defn workspace []
-  (let [exsrc @(rf/subscribe [:source-esexpr])]
+  (let [exsrc @(rf/subscribe [:source-esexpr])
+        _ (rf/dispatch [:reset-blocks-list])]
     [:div {:class ["px-5" "py-3" "h-full" "overflow-y-auto"]
-           :on-click #(rf/dispatch [:blocks-reset-selected])}
+           :on-click #(rf/dispatch [:reset-selected-block])}
      [:div {:class ["flex" "flex-col" "items-start" "justify-start"]}
       (for [blk (esxepr->blk exsrc)]
         ^{:key (str "block-" (second blk))}
-        [:div blk])
+        blk)
       [:div {:class ["text-xs" "text-slate-400" "mt-2"
                      "select-none" "cursor-pointer"
                      "flex" "items-center"]

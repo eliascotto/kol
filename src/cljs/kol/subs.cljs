@@ -1,6 +1,7 @@
 (ns kol.subs
   (:require
-   [re-frame.core :as rf]))
+   [re-frame.core :as rf :refer [reg-sub]]
+   [kol.fn.esexpr :refer [get-block-by-id]]))
 
 (defn db-get [& keys]
   (fn [db _]
@@ -10,60 +11,60 @@
   ([k]
    (def-sub k k))
   ([k-sub k]
-   (rf/reg-sub k-sub (db-get k))))
+   (reg-sub k-sub (db-get k))))
 
 ;; Subscriptions
 
-(rf/reg-sub
+(reg-sub
  :common/route
  (fn [db _]
    (-> db :common/route)))
 
-(rf/reg-sub
+(reg-sub
  :route/page-id
  :<- [:common/route]
  (fn [route _]
    (-> route :data :name)))
 
-(rf/reg-sub
+(reg-sub
  :common/page
  :<- [:common/route]
  (fn [route _]
    (-> route :data :view)))
 
-(rf/reg-sub
+(reg-sub
  :common/error
  (fn [db _]
    (:common/error db)))
 
-(rf/reg-sub
+(reg-sub
  :repl
  (fn [db _]
    (-> db :repl)))
 
 ;; Collection of maps with the REPL command history.
-(rf/reg-sub
+(reg-sub
  :repl-history
  :<- [:repl]
  (fn [repl _]
    (:history repl)))
 
 ;; Store the REPL input while typed in the input el
-(rf/reg-sub
+(reg-sub
  :repl-input
  :<- [:repl]
  (fn [repl _]
    (:input repl)))
 
 ;; Store a multiline command as a single string
-(rf/reg-sub
+(reg-sub
  :repl-multiline
  :<- [:repl]
  (fn [repl _]
    (:multiline repl)))
 
 ;; Set a command input placeholder in case of EOF error
-(rf/reg-sub
+(reg-sub
  :repl-placeholder
  :<- [:repl]
  (fn [repl _]
@@ -78,18 +79,18 @@
 ;; BLOCKS
 ;;
 
-(rf/reg-sub
+(reg-sub
  :blocks
  (fn [db _]
    (-> db :blocks)))
 
-(rf/reg-sub
+(reg-sub
  :blocks-selected
  :<- [:blocks]
  (fn [blocks _]
    (:selected blocks)))
 
-(rf/reg-sub
+(reg-sub
  :blocks-list
  :<- [:blocks]
  (fn [blocks _]
@@ -99,31 +100,46 @@
 ;; BLOCK
 ;;
 
-(rf/reg-sub
+;; Signal function
+;; see: https://day8.github.io/re-frame/subscriptions/#reg-sub
+(reg-sub
  :block
- (fn [db _]
-   (-> db :block)))
+ :<- [:blocks-list]
+ (fn [blocks [_ id]]
+   (get-block-by-id blocks id)))
 
-(rf/reg-sub
+(reg-sub
  :sexpr-list
  :<- [:block]
- (fn [block _]
+ (fn [block []]
    (:sexpr-list block)))
 
-(rf/reg-sub
+(reg-sub
  :sexpr-first
  :<- [:block]
  (fn [block _]
    (first (:sexpr-list block))))
 
-(rf/reg-sub
+(reg-sub
  :sexpr-input-value
  :<- [:block]
  (fn [block _]
    (:input block)))
 
-(rf/reg-sub
+(reg-sub
  :sexpr-input-string?
  :<- [:block]
  (fn [block _]
    (:input-string? block)))
+
+(reg-sub
+ :focused-item
+ :<- [:block]
+ (fn [block _]
+   (get-in block [:focused-item :ref])))
+
+(reg-sub
+ :focused-item-value
+ :<- [:block]
+ (fn [block _]
+   (get-in block [:focused-item :value])))

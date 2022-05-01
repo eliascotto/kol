@@ -71,7 +71,7 @@
                    "p-1" "rounded-md" "cursor-pointer"
                    "hover:text-slate-300"
                    "text-[13px]" "font-mono"]
-           :on-click #(rf/dispatch [:blocks-set-selected chld-blk])}
+           :on-click #(rf/dispatch [:set-selected-block chld-blk])}
      [:span {:class ["truncate" "pl-1"]}
       (remove-brackets sexpr)]
      [:div {:class ["h-5"]}

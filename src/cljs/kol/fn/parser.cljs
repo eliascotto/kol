@@ -3,42 +3,78 @@
    [re-frame.core :as rf]
    [rewrite-clj.zip :as z]
    [kol.utils.log :as log]
+   [kol.utils.core :as utils]
+   [kol.fn.esexpr :as sexpr-fn]
    [kol.comp.block.core :refer [block]]
    [kol.comp.block.code-wrappers :as wrapper]
-   [kol.comp.block.common :as common]))
+   [kol.comp.block.common :as common]
+   [kol.comp.block.input :refer [block-input]]))
+
+(declare save-esexpr-db)
 
 (defn esxepr->blk
   "Convert an extended symbolic expression into a block
    structure."
   [esexpr]
-  (map
-   (fn [es]
-     (let [sexpr (:sexpr es)]
-       (case (:type es)
-         :list
-         [block es (esxepr->blk (:children es))]
+  (save-esexpr-db esexpr)
+  (->> esexpr
+       (map
+        (fn [ex]
+          (let [sexpr (:sexpr ex)]
+            (case (:type ex)
+              :list
+              (let [id (sexpr-fn/block-id ex)]
+                [block-input id])
 
-         :vector
-         [wrapper/vector (esxepr->blk (:children es))]
+              :vector
+              [wrapper/vector (esxepr->blk (:children ex))]
 
-         :map
-         [wrapper/map (esxepr->blk (:children es))]
+              :map
+              [wrapper/map (esxepr->blk (:children ex))]
 
-         :keyword
-         [common/expr-el [wrapper/keyword sexpr]]
+              :keyword
+              [common/expr-el [wrapper/keyword sexpr]]
 
-         :symbol
-         [wrapper/symbol (str sexpr)]
+              :symbol
+              [wrapper/symbol (str sexpr)]
 
-         :string
-         [wrapper/string (str "\"" sexpr "\"")]
+              :string
+              [wrapper/string (str "\"" sexpr "\"")]
 
-         :number
-         [common/expr-el [wrapper/number sexpr]]
+              :number
+              [common/expr-el [wrapper/number sexpr]]
 
-         (do (log/error "SEXPR unknown type: " (:type es))
-             (println (pr-str es))))))
-   esexpr))
+              (if (contains? ex :newlines)
+                nil
+                (do (log/error "SEXPR unknown type: " (:type ex))
+                    (println (pr-str ex))))))))
+       ;; Filter nil elements and new lines
+       (filter identity)))
+
+
+(defn create-block-ref [expr]
+  (let [id (sexpr-fn/block-id expr)]
+    {:id id
+     :selected? false     ;; is element selected
+     :items []            ;; reference to input elements
+     :esexpr expr}))
+
+
+(defn save-esexpr-db
+  "Store all esexpr into the db as a flatten vector."
+  [esexpr]
+  (loop [exs esexpr]
+    (when-not (empty? exs)
+      (let [ex (first exs)
+            t (:tag ex)]
+        ;; If :list append it to block reference
+        (when (= t :list)
+          (rf/dispatch [:append-block-to-blocks-list (create-block-ref ex)]))
+        ;; If :list/:vector/:map append children to the list
+        (if (utils/in? [:vector :map :list] t)
+          (recur (concat (rest exs) (:children ex)))
+          (recur (rest exs)))))))
+
 
 (defn parse-sexpr
   "Returns the information extracted from the block 
@@ -63,6 +99,7 @@
         {:type :list
          :function f
          :arguments (into [] args)}))))
+
 
 (defn find-child-block
   "Returns a `Block` with `:parent` equals to `parent-blk` and
