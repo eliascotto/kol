@@ -5,6 +5,7 @@
 
 (declare parse-sexpr)
 
+
 (defn parse-expr
   "Parse an expression rapresented by an atom or a sexpr."
   [zloc loc]
@@ -41,6 +42,7 @@
           :else {:type (type sexpr)
                  :sexpr sexpr})))))
 
+
 ;; Location represent the index of the list inside
 ;; the structure. Every level of depth is a new entry in
 ;; the vector [1 2 1 3 ...] and the integer value
@@ -75,11 +77,13 @@
    n)\n\n()")
   )
 
+
 (defn source->esexpr
   "Returns an extended-symbolic-expression extracted from sources."
   [src]
   (let [zip (z/of-string (str src) {:track-position? true})]
     (parse-sexpr zip [])))
+
 
 (defn esexpr->source
   "Returns a source code string extracted from the `esexpr`."
@@ -101,9 +105,11 @@
                 (:sexpr ex))]
         (recur (rest exs) (conj src x))))))
 
+
 (defn update-expr
-  "Update an expression :ex inside the :esexpr structure and 
-  returns a map composed by :esexpr and :source."
+  "Update an expression pointed by `node`
+  with the `expr` value, inside the source code 
+  and returns a map composed by the new :esexpr and :source."
   [{:keys [source node expr]}]
   (let [new-source (-> source
                        (z/of-string {:track-position? true})
@@ -141,6 +147,7 @@
   (meta (resolve 'defn))
   (conj () {:a 1})
   (resolve nil))
+
 
 (defn add-block
   [source]

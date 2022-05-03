@@ -4,7 +4,7 @@
    [re-frame.core :as rf]
    [clojure.string :as string]
    [clojure.edn :as edn]
-   [kol.env :as env]
+   [kol.env :as env :refer [debug]]
    [kol.utils.core :as utils]
    [kol.fn.esexpr :as esexpr-fn]
    [kol.macros :refer [map-keys for-indexed]]
@@ -17,16 +17,17 @@
 (declare on-input-blur
          on-input-keydown
          on-input-change
-         on-input-focus
          on-block-click
          split-rows
          create-expr
          block-bg-color
-         input-el
+         editable-el
          vector-container
+         map-container
+         item-container
          row-container
          function-el
-         extract-args)
+         create-item-key)
 
 
 (defn update-source
@@ -47,9 +48,6 @@
   '(defn undef [] nil))
 
 
-(defn newline? [expr] (= expr "\n"))
-
-
 (defn block-input
   "Component to make a block editable.
   Receive the id for the block."
@@ -67,17 +65,15 @@
            :on-click #(on-block-click % id)}
      ;; Block header
      [row-container
-      (create-expr (first rows) 0 id)]
+      (create-expr {:exs      (first rows)
+                    :row-idx  0
+                    :block-id id})]
      ;; Block arguments
      (for-indexed [[idx row] (rest rows)]
                   [row-container
-                   (create-expr row (inc idx) id)])]))
-
-(comment
-  (let [x  (->> (rest ["foo" "1" "\n"])
-                (partition-by #(newline? %))
-                (filter #(not= % '("\n"))))]
-    (split-at (dec (count x)) x)))
+                   (create-expr {:exs      row
+                                 :row-idx  (inc idx)
+                                 :block-id id})])]))
 
 
 (defn split-rows
@@ -88,83 +84,79 @@
        (filter #(not (contains? (first %) :newlines)))
        (map vec)))
 
-(comment
-  (let [c {:children '({:sexpr case, :position [3 2], :tag :token, :type :symbol, :arglists ([e & clauses]), :doc "Takes an expression, and a set of clauses.\n\n  Each clause can take the form of either:\n\n  test-constant result-expr\n\n  (test-constant1 ... test-constantN)  result-expr\n\n  The test-constants are not evaluated. They must be compile-time\n  literals, and need not be quoted.  If the expression is equal to a\n  test-constant, the corresponding result-expr is returned. A single\n  default expression can follow the clauses, and its value will be\n  returned if no clause matches. If no default expression is provided\n  and no clause matches, an IllegalArgumentException is thrown.\n\n  Unlike cond and condp, case does a constant-time dispatch, the\n  clauses are not considered sequentially.  All manner of constant\n  expressions are acceptable in case, including numbers, strings,\n  symbols, keywords, and (Clojure) composites thereof. Note that since\n  lists are used to group multiple constants that map to the same\n  expression, a vector can be used to match a list if needed. The\n  test-constants need not be all of the same type.", :ns "clojure.core"} {:sexpr n, :position [3 7], :tag :token, :type :symbol} {:newlines 1} {:sexpr 1, :position [4 3], :tag :token, :type :number} {:sexpr 2, :position [4 5], :tag :token, :type :number} {:newlines 1} {:sexpr 2, :position [5 3], :tag :token, :type :number} {:sexpr 3, :position [5 5], :tag :token, :type :number} {:newlines 1} {:sexpr 4, :position [6 3], :tag :token, :type :number} {:sexpr 5, :position [6 5], :tag :token, :type :number})}]
-    (split-rows c)))
+
+(defn create-editable-item
+  "Create a new editable element and push item
+  reference into the app db."
+  [expr row-idx col-idx block-id]
+  (let [item-key (create-item-key (map-keys row-idx col-idx block-id))
+        item (pr-str (:sexpr expr))]
+    (rf/dispatch [:save-item item-key item])
+    [editable-el (map-keys expr row-idx col-idx block-id)]))
 
 
 (defn create-expr
   "Parse expr content (eventually row by row).
   Does not manage new lines!
   `header?` is to differentiate the first line."
-  [exs row-idx block-id]
+  [{:keys [exs row-idx block-id col-idx-offset]
+    :or {col-idx-offset 0}}]
   (map-indexed
-   (fn [col-idx expr]
-     (let [sexpr (:sexpr expr)]
+   (fn [idx expr]
+     (let [col-idx (+ col-idx-offset idx)]
        (case (:type expr)
          :list
          [block-input (esexpr-fn/block-id expr)]
 
          :vector
-          ;; add vector element
-         [vector-container sexpr]
+         [vector-container
+          (map-keys expr row-idx col-idx block-id)]
 
          :map
-          ;; add map element
-         nil
+         [map-container (map-keys expr row-idx col-idx block-id)]
 
          :symbol
          (if (and (zero? row-idx) (zero? col-idx))
-           [function-el expr]
-           [input-el (map-keys expr row-idx col-idx block-id)])
+           [function-el expr block-id]
+           [item-container
+            (create-editable-item expr row-idx col-idx block-id)])
 
          (:number :keyword :string)
-         [input-el (map-keys expr row-idx col-idx block-id)])))
+         [item-container
+          (create-editable-item expr row-idx col-idx block-id)]
+
+         (println "Not-maching-type" (:type expr)))))
    exs))
 
 
-(defn create-item-ref
-  "Return a reference map for the item."
-  [{:keys [row-idx col-idx block-id]}]
-  {:id block-id :row row-idx :col col-idx})
-
-
-(defn focused?
-  "Returns true if the block pointed by parameters is
-  selected."
-  [blk]
-  (let [focused-item @(rf/subscribe [:focused-item])]
-    (= focused-item (create-item-ref blk))))
-
-
-(defn input-el
+(defn editable-el
   "Element that wrap the content of the item with a
   contentEditable div.
   Manages the focus and the caret position."
   [{:keys [expr row-idx col-idx block-id]}]
-  (let [focused (focused? (map-keys row-idx col-idx block-id))
+  (let [item-key (create-item-key (map-keys row-idx col-idx block-id))
         expr-type (:type expr)
-        value (if focused
-                @(rf/subscribe [:focused-item-value])
-                (:sexpr expr))]
+        value @(rf/subscribe [:item item-key])]
     [content-editable
      {:class ["bg-transparent" "outline-none" "text-[13px]"
-              "font-mono" "w-auto" "min-w-[24px]"
+              "font-mono" "w-auto"
               (when (= expr-type :keyword) "text-[#78D1E1]")
               (when (= expr-type :number) "text-[#78D1E1]")
               (when (= expr-type :string) "text-[#E7DE79]")
               (when (and (zero? row-idx) (zero? col-idx))
                 "text-[#67E480]")]
-      :value (pr-str value)
-      :autofocus true
-      :on-change on-input-change
-      :on-focus #(on-input-focus % (map-keys expr row-idx col-idx block-id))
-    ;;  :on-blur #(on-input-blur % esexpr)
-      :on-key-down on-input-keydown}]))
+      :value value
+      :on-change #(on-input-change % item-key)
+      :on-blur #(on-input-blur % expr item-key)
+      ;; :on-key-down on-input-keydown
+      :attrs {:auto-complete "off"
+              :auto-correct "off"
+              :auto-capitalize "off"
+              :spell-check "false"}}]))
 
 
 (defn on-input-keydown [e]
-  (let [sexpr-input-value @(rf/subscribe [:sexpr-input-value]) ; current input value of sexpr
+  (let [sexpr-input-value @(rf/subscribe [:sexpr-input-value])   ; current input value of sexpr
         input-string?     @(rf/subscribe [:sexpr-input-string?]) ; true if current input is inside `""`
         keycode (.-code e)]
     (case keycode
@@ -214,34 +206,20 @@
       nil)))
 
 
-(defn on-input-focus
-  [_ {:keys [expr row-idx col-idx block-id]}]
-  (let [item-ref (create-item-ref (map-keys row-idx col-idx block-id))
-        value (pr-str (:sexpr expr))]
-    (rf/dispatch [:set-focused-item item-ref])
-    (rf/dispatch [:set-focused-item-value value])))
-
-
 (defn on-input-blur
-  "On input blur, save the content of the block."
-  [e esexpr]
-  (let [sexpr-list        @(rf/subscribe [:sexpr-list])
-        sexpr-input-value @(rf/subscribe [:sexpr-input-value])
-        last-input (when sexpr-input-value (string/trim sexpr-input-value))
-        ;; append last input to the expr collection, if not empty
-        coll-str (->> (if (empty? last-input)
-                        sexpr-list
-                        (conj sexpr-list last-input))
-                      (filter #(not (newline? %)))
-                      (string/join " "))
-        new-expr (str "(" coll-str ")")]
-    (update-source (edn/read-string new-expr) esexpr)))
+  "Send the item value to the server and update
+  the code structure."
+  [_ esexpr item-key]
+  (let [origin (pr-str (:sexpr esexpr))
+        value @(rf/subscribe [:item item-key])]
+    (when (not= origin value)
+      (update-source (edn/read-string value) esexpr))))
 
 
 (defn on-input-change
   "On input change"
-  [{:keys [value]}]
-  (rf/dispatch-sync [:set-sexpr-input-value value]))
+  [{:keys [value]} item-key]
+  (rf/dispatch-sync [:save-item item-key value]))
 
 
 (defn on-block-click [e id]
@@ -249,16 +227,40 @@
   (rf/dispatch [:set-selected-block id]))
 
 
-(defn function-el [esexpr]
+(defn function-el [esexpr block-id]
   [:div {:class ["px-1.5" "rounded-br-md" "rounded-tl-md"
                  "border" "border-slate-500" "mr-2"]}
-   [input-el esexpr 0 0]])
+   (create-editable-item esexpr 0 0 block-id)])
 
 
-(defn vector-container [sexpr]
-  (str "["
-       sexpr
-       "]"))
+(defn vector-container
+  [{:keys [expr row-idx col-idx block-id]}]
+  [:div {:class ["flex" "flex-row" "text-[13px]"]}
+   [:div {:class ["mr-1"]} "["]
+   [:div {:class ["flex" "flex-row"]}
+    (create-expr {:exs (:children expr)
+                  :row-idx row-idx
+                  :block-id block-id
+                  :col-idx-offset col-idx})]
+   [:div {:class ["ml-1"]} "]"]])
+
+
+(defn map-container
+  [{:keys [expr row-idx col-idx block-id]}]
+  [:div {:class ["flex" "flex-row" "text-[13px]"]}
+   [:div {:class ["mr-1"]} "{"]
+   [:div {:class ["flex" "flex-row"]}
+    (create-expr {:exs (:children expr)
+                  :row-idx row-idx
+                  :block-id block-id
+                  :col-idx-offset col-idx})]
+   [:div {:class ["ml-1"]} "}"]])
+
+
+(defn item-container
+  [& child]
+  [:div {:class ["mr-2" "last:mr-0"]}
+   child])
 
 
 (defn row-container [& child]
@@ -266,26 +268,14 @@
    child])
 
 
-(defn extract-args
-  "Returns a vector composed by the collections of argument
-  to the expr divided by `prev` and `last`."
-  []
-  (let [sexpr-list @(rf/subscribe [:sexpr-list])
-        coll (rest sexpr-list)
-        last-expr-newline? (= (last coll) "\n")
-        split-at-newline (fn [xs] (partition-by #(newline? %) xs))
-        remove-newline (fn [xs] (filter #(not= % '("\n")) xs))]
-    (if last-expr-newline?
-      [(-> (butlast coll)
-           split-at-newline
-           remove-newline)
-       (list "\n")]
-      (let [args (split-at-newline (remove-newline coll))
-            [prv lst] (split-at (dec (count args)) args)]
-        [prv (first lst)]))))
-
-
 (defn block-bg-color
   "Return a string of the background class for the block."
   [depth]
   (str "bg-slate-" (if (even? depth) 800 700)))
+
+
+(defn create-item-key
+  "Return a reference map for the item."
+  [{:keys [row-idx col-idx block-id]}]
+  {:id block-id :row row-idx :col col-idx})
+

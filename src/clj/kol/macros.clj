@@ -32,3 +32,25 @@
     (map-keys a b) ; => {:a 1, :b 2}
     ;; (macroexpand-1 '(map-keys a b))
     ))
+
+(defmacro when-let*
+  "When-let multiple bindings version.
+  All bindings are evaluated before checking for falsyness."
+  [bindings & body]
+  (if (seq bindings)
+    `(when-let [~(first bindings) ~(second bindings)]
+       (when-let* ~(drop 2 bindings) ~@body))
+    `(do ~@body)))
+
+(comment
+  (when-let* [a 1
+              b 2
+              c (+ a b)]
+             (println "yeah!")
+             c)
+  (macroexpand-1 '(when-let* [a 1
+                              b 2
+                              c (+ a b)]
+                             (println "yeah!")
+                             c))
+  )

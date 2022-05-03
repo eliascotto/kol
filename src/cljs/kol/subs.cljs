@@ -134,12 +134,24 @@
 
 (reg-sub
  :focused-item
- :<- [:block]
- (fn [block _]
-   (get-in block [:focused-item :ref])))
+ :<- [:blocks]
+ (fn [blocks _]
+   (get-in blocks [:focused-item :ref])))
 
 (reg-sub
  :focused-item-value
- :<- [:block]
- (fn [block _]
-   (get-in block [:focused-item :value])))
+ :<- [:blocks]
+ (fn [blocks _]
+   (get-in blocks [:focused-item :value])))
+
+(reg-sub
+ :blocks-items
+ :<- [:blocks]
+ (fn [blocks _]
+   (:items blocks)))
+
+(reg-sub
+ :item
+ :<- [:blocks-items]
+ (fn [items [_ k]]
+   (get items k)))

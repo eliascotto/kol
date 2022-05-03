@@ -5,15 +5,14 @@
    [kol.fn.esexpr :refer [get-block-by-id]]))
 
 (reg-event-db
- :blocks-set-selected
+ :set-selected-block
  (fn [db [_ blk]]
    (assoc-in db [:blocks :selected] blk)))
 
 (reg-event-fx
  :reset-selected-block
  (fn [{:keys [db]} [_]]
-   {:db (assoc-in db [:blocks :selected] nil)
-    :dispatch [:reset-focused-item]}))
+   {:db (assoc-in db [:blocks :selected] nil)}))
 
 (reg-event-db
  :reset-blocks-list
@@ -70,3 +69,7 @@
  (fn [db [_ value]]
    (assoc-in db [:blocks :focused-item :value] value)))
 
+(reg-event-db
+ :save-item
+ (fn [db [_ k v]]
+   (assoc-in db [:blocks :items k] v)))

@@ -34,9 +34,7 @@
     15 \"fizzbuzz\"
     3  \"fizz\"
     5  \"buzz\"
-    n))
-  
-()"
+    n))"
    ;; esexpr extracted from server
    :source-esexpr nil})
 
