@@ -14,7 +14,8 @@
      [:div {:class ["flex" "flex-col" "items-start" "justify-start"]}
       (for [blk (esxepr->blk exsrc)]
         ^{:key (str "block-" (second blk))}
-        blk)
+        [:div {:class ["my-2"]}
+         blk])
       [:div {:class ["text-xs" "text-slate-400" "mt-2"
                      "select-none" "cursor-pointer"
                      "flex" "items-center"]

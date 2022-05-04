@@ -82,7 +82,7 @@
 (defn block-el
   [{:keys [esexpr fun lvl fun-call? args parsed-args header]}]
   (let [bg-color (block-bg-color lvl)
-        selected? (= @(rf/subscribe [:blocks-selected]) esexpr)
+        selected? (= @(rf/subscribe [:selected-block]) esexpr)
         [inline-args newline-args] parsed-args
         indent-args? (and fun-call?
                           (empty? inline-args)

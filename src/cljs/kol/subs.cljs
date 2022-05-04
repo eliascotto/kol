@@ -85,7 +85,7 @@
    (-> db :blocks)))
 
 (reg-sub
- :blocks-selected
+ :selected-block
  :<- [:blocks]
  (fn [blocks _]
    (:selected blocks)))

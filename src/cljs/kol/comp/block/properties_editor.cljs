@@ -64,7 +64,7 @@
           (if @open? "chevron-up" "chevron-down")]])])))
 
 (defn go-to-block-btn [sexpr]
-  (let [blk @(rf/subscribe [:blocks-selected])
+  (let [blk @(rf/subscribe [:selected-block])
         chld-blk (parser/find-child-block blk sexpr)]
     [:div {:class ["bg-slate-700" "flex" "flex-row" "my-1"
                    "items-center" "justify-between" "text-slate-400"
@@ -246,7 +246,7 @@
             :on-click #(swap! open? not)}]
      (when @open?
        [:div {:class ["h-full" "w-full"]}
-        (if-let [blk @(rf/subscribe [:blocks-selected])]
+        (if-let [blk @(rf/subscribe [:selected-block])]
           (let [props (parser/parse-sexpr blk)
                 t (:type props)]
             [:div {:class ["py-4" "px-4"]}

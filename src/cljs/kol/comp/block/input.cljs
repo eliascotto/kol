@@ -26,6 +26,7 @@
          map-container
          item-container
          row-container
+         header-container
          function-el
          create-item-key)
 
@@ -53,6 +54,8 @@
   Receive the id for the block."
   [id]
   (let [block @(rf/subscribe [:block id])
+        selected @(rf/subscribe [:selected-block])
+        selected? (= selected id)
         esexpr (:esexpr block)
         rows (split-rows esexpr)
         depth (dec (count (:location esexpr)))
@@ -60,19 +63,27 @@
     [:div {:class [bg-color "text-slate-200"
                    "w-fit" "min-w-[90px]"
                    "shadow-md" "rounded-md"
-                   "my-2"
-                   "flex" "flex-col" "items-start" "justify-start"]
+                   "flex" "flex-col" "items-start" "justify-start"
+                   "border" "cursor-pointer"
+                   (if selected?
+                     "border-slate-400" "border-transparent")]
            :on-click #(on-block-click % id)}
      ;; Block header
-     [row-container
-      (create-expr {:exs      (first rows)
-                    :row-idx  0
-                    :block-id id})]
+     (let [row (first rows)
+           fn-call (first row)
+           args (rest row)]
+       [header-container
+        [function-el fn-call id]
+        (create-expr {:exs args
+                      :row-idx 0
+                      :block-id id
+                      :col-idx-offset 1})])
      ;; Block arguments
      (for-indexed [[idx row] (rest rows)]
+                  ^{:key (str "block-" id "row-" idx)}
                   [row-container
-                   (create-expr {:exs      row
-                                 :row-idx  (inc idx)
+                   (create-expr {:exs row
+                                 :row-idx (inc idx)
                                  :block-id id})])]))
 
 
@@ -104,28 +115,29 @@
   (map-indexed
    (fn [idx expr]
      (let [col-idx (+ col-idx-offset idx)]
-       (case (:type expr)
-         :list
-         [block-input (esexpr-fn/block-id expr)]
+       (->
+        (case (:type expr)
+          :list
+          [block-input (esexpr-fn/block-id expr)]
 
-         :vector
-         [vector-container
-          (map-keys expr row-idx col-idx block-id)]
+          :vector
+          [vector-container
+           (map-keys expr row-idx col-idx block-id)]
 
-         :map
-         [map-container (map-keys expr row-idx col-idx block-id)]
+          :map
+          [map-container (map-keys expr row-idx col-idx block-id)]
 
-         :symbol
-         (if (and (zero? row-idx) (zero? col-idx))
-           [function-el expr block-id]
-           [item-container
-            (create-editable-item expr row-idx col-idx block-id)])
+          :symbol
+          [item-container
+           (create-editable-item expr row-idx col-idx block-id)]
 
-         (:number :keyword :string)
-         [item-container
-          (create-editable-item expr row-idx col-idx block-id)]
+          (:number :keyword :string)
+          [item-container
+           (create-editable-item expr row-idx col-idx block-id)]
 
-         (println "Not-maching-type" (:type expr)))))
+          (println "Not-maching-type" (:type expr)))
+        (with-meta {:key (str "block-" block-id 
+                              "-item-" row-idx col-idx)}))))
    exs))
 
 
@@ -139,7 +151,7 @@
         value @(rf/subscribe [:item item-key])]
     [content-editable
      {:class ["bg-transparent" "outline-none" "text-[13px]"
-              "font-mono" "w-auto"
+              "font-mono" "w-auto" "cursor-text"
               (when (= expr-type :keyword) "text-[#78D1E1]")
               (when (= expr-type :number) "text-[#78D1E1]")
               (when (= expr-type :string) "text-[#E7DE79]")
@@ -228,8 +240,8 @@
 
 
 (defn function-el [esexpr block-id]
-  [:div {:class ["px-1.5" "rounded-br-md" "rounded-tl-md"
-                 "border" "border-slate-500" "mr-2"]}
+  [:div {:class [;;"rounded-br-md" "rounded-tl-md"  "border" "border-slate-500"
+                 "mr-2"]}
    (create-editable-item esexpr 0 0 block-id)])
 
 
@@ -260,6 +272,12 @@
 (defn item-container
   [& child]
   [:div {:class ["mr-2" "last:mr-0"]}
+   child])
+
+
+(defn header-container [& child]
+  [:div {:class ["flex" "flex-row" "items-center"
+                 "py-1" "px-2"]}
    child])
 
 
