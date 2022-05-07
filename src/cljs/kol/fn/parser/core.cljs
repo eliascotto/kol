@@ -1,14 +1,13 @@
-(ns kol.fn.parser
+(ns kol.fn.parser.core
   (:require
    [re-frame.core :as rf]
    [rewrite-clj.zip :as z]
    [kol.utils.log :as log]
    [kol.utils.core :as utils]
-   [kol.fn.esexpr :as sexpr-fn]
-   [kol.comp.block.core :refer [block]]
+   [kol.fn.vld.core :as vld]
    [kol.comp.block.code-wrappers :as wrapper]
    [kol.comp.block.common :as common]
-   [kol.comp.block.input :refer [block-input]]))
+   [kol.comp.block.core :refer [block]]))
 
 (declare save-esexpr-db)
 
@@ -23,8 +22,8 @@
           (let [sexpr (:sexpr ex)]
             (case (:type ex)
               :list
-              (let [id (sexpr-fn/block-id ex)]
-                [block-input id])
+              (let [id (vld/block-id ex)]
+                [block id])
 
               :vector
               [wrapper/vector (esxepr->blk (:children ex))]
@@ -53,7 +52,7 @@
 
 
 (defn create-block-ref [expr]
-  (let [id (sexpr-fn/block-id expr)]
+  (let [id (vld/block-id expr)]
     {:id id
      :selected? false     ;; is element selected
      :items []            ;; reference to input elements

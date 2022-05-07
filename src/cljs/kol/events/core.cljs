@@ -7,8 +7,7 @@
    [kol.events.repl]
    [kol.events.blocks]
    [kol.events.source]
-   [kol.events.sexpr]
-   [kol.fn.esexpr :as esexpr]))
+   [kol.events.sexpr]))
 
 ;; ----------------------
 ;; Helpers
@@ -47,6 +46,11 @@
  ; gets user from localstore, and puts into coeffects arg
  (fn [_ _]
    {:db default-db}))
+
+(rf/reg-event-fx
+ :socket-connected
+ (fn [{:keys [db]} _]
+   {:compute-esexpr (:source db)}))
 
 (rf/reg-event-db
  :set-error

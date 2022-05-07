@@ -36,14 +36,14 @@
             (when (not= (:value new-argv) (:value old-argv))
               (if snapshot
                 (utils/set-caret-at-pos (get-el) snapshot)
-                (utils/set-caret-at-end (get-el))))))
+                (utils/place-caret (get-el))))))
 
         :reagent-render
-        (fn [{:keys [value class attrs placeholder disabled
+        (fn [{:keys [value set-ref class attrs placeholder disabled
                      on-change on-focus on-blur on-key-down]}]
           [:div (merge
                  {:class class
-                  :ref #(reset! ref %)
+                  :ref #(if (fn? set-ref) (set-ref %) (reset! ref %))
                   :on-input #(emit-change (get-el) on-change)
                   :on-focus on-focus
                   :on-blur on-blur

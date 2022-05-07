@@ -23,11 +23,12 @@
   (def chsk-state state)   ; Watchable, read-only atom
   (add-watch state :state-watcher state-watcher))
 
-(defn stop-router! [] 
-  (when-let [stop-f @router_] 
+(defn stop-router! []
+  (when-let [stop-f @router_]
     (stop-f)))
 
-(defn start! []
+(defn start!
+  [callback]
   (stop-router!)
   (->> handlers/event-msg-handler
        (sente/start-client-chsk-router! ch-chsk)

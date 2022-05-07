@@ -74,8 +74,7 @@
 (comment
   (source->esexpr
    "(defn fizz-buzz [n]
-   n)\n\n()")
-  )
+   n)\n\n()"))
 
 
 (defn source->esexpr
@@ -106,50 +105,31 @@
         (recur (rest exs) (conj src x))))))
 
 
+(defn- find-source-node
+  "Get the node in the source code."
+  [source node]
+  (-> source
+      str
+      (z/of-string {:track-position? true})
+      z/up
+      (z/find-tag-by-pos (:position node)
+                         (:tag node))))
+
+
 (defn update-expr
   "Update an expression pointed by `node`
-  with the `expr` value, inside the source code 
-  and returns a map composed by the new :esexpr and :source."
+  with the `expr` value, inside the source code. 
+  Returns a map composed by the new :esexpr and :source."
   [{:keys [source node expr]}]
-  (let [new-source (-> source
-                       (z/of-string {:track-position? true})
-                       z/up
-                       (z/find-tag-by-pos (:position node)
-                                          (:tag node))
+  (let [new-source (-> (find-source-node source node)
                        (z/replace expr)
                        z/root-string)]
     {:source new-source
      :esexpr (source->esexpr new-source)}))
 
-(comment
-  (update-expr
-   {:source "(defn fizz-buzz (n) n)  ()"
-    :node {:sexpr (), :position [1 25], :tag :list, :type :list, :location [1]}
-    :expr '(defn undef [] nil)})
-  (source->esexpr
-   "(defn fizz-buzz [n] n)\n\n()")
-  (let [s (str "(defn fizz-buzz (n) n)  ()")]
-    (-> s
-        (z/of-string {:track-position? true})
-        z/up
-        (z/find-tag-by-pos [1 25] :list)
-        (z/replace '(defn undef [] nil))
-        z/root-string))
-  (-> "(defn fizz-buzz (n) n)
-(defn undef [] nil)"
-      (z/of-string {:track-position? true})
-      z/up
-      (z/find-tag-by-pos [1 18] :token))
-  (reverse '(1 2 3))
-  (conj [3] 4)
-  (first '())
-  (-> 'defn fn-ext-meta)
-  (meta (resolve 'defn))
-  (conj () {:a 1})
-  (resolve nil))
-
 
 (defn add-block
+  "Add a new block returning the source code string."
   [source]
   (-> source
       str
@@ -167,5 +147,27 @@
       z/next
       z/right*))
 
-(comment
-  (z/of-string "{:a 1}"))
+
+(defn insert-expr
+  "Add a new node with content `expr` at the
+  `side` of `node`. On the :right side by default.
+  Returns a map composed by the new :esexpr and :source."
+  [{:keys [source node expr side] :or {side :right}}]
+  (let [insert-fn (if (= side :left) 
+                    z/insert-left
+                    z/insert-right)
+        new-source (-> (find-source-node source node)
+                       (insert-fn expr)
+                       z/root-string)]
+    {:source new-source
+     :esexpr (source->esexpr new-source)}))
+
+(defn remove-expr
+  "Remove the node pointer by `node`.
+  Returns a map composed by the new :esexpr and :source."
+  [{:keys [source node]}]
+  (let [new-source (-> (find-source-node source node)
+                       (z/remove)
+                       z/root-string)]
+    {:source new-source
+     :esexpr (source->esexpr new-source)}))

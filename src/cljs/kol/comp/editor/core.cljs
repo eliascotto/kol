@@ -79,7 +79,7 @@
                        (j/push! extensions))})))
 
 (defn update-source [source]
-  (rf/dispatch [:source-update source]))
+  (rf/dispatch [:update-source source]))
 
 (defn editor-el [source]
   (r/with-let [editor-view (r/atom nil)

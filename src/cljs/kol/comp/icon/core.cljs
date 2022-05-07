@@ -3,7 +3,7 @@
    ["@heroicons/react/solid" :as herosolid]
    ["@heroicons/react/outline" :as herooutline]
    [goog.object :as g]
-   [kol.fn.strings :refer [pascal-case]]))
+   [kol.utils.string :refer [pascal-case]]))
 
 (defn icon
   "Add an icon from https://heroicons.com.

@@ -1,9 +1,8 @@
 (ns kol.comp.workspace.core
   (:require
    [re-frame.core :as rf]
-   [kol.fn.parser :refer [esxepr->blk]]
-   [kol.fn.esexpr :as esexpr]
-   [kol.comp.button.add-block :as add-block]
+   [kol.fn.parser.core :refer [esxepr->blk]]
+   [kol.fn.vld.core :as vld]
    [kol.comp.icon.core :refer [icon]]))
 
 (defn workspace []
@@ -20,7 +19,7 @@
                      "select-none" "cursor-pointer"
                      "flex" "items-center"]
              :title "Click to add a new block"
-             :on-click #(esexpr/add-new-block)}
+             :on-click #(vld/add-new-block)}
        [icon {:class ["w-3.5" "h-3.5" "mr-1"]}
         "plus"]
        "Add block"]]]))

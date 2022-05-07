@@ -18,7 +18,7 @@
    [reitit.core :as reitit]
    [reitit.frontend.easy :as rfe]
    [clojure.string :as string]
-   [kol.fn.esexpr :as esexpr])
+   [kol.fn.vld.core :as vld])
   (:import goog.History))
 
 (defn about-page []
@@ -69,8 +69,7 @@
 
 (defn init! []
   (start-router!)
-  (socket/start!)
+  (socket/start! #(vld/fetch))
   (ajax/load-interceptors!)
   (mount-components)
-  (rf/dispatch-sync [:initialize-db])
-  (esexpr/fetch))
+  (rf/dispatch-sync [:initialize-db]))

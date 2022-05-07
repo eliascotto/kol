@@ -1,4 +1,6 @@
-(ns kol.handlers)
+(ns kol.handlers
+  (:require
+   [re-frame.core :as rf]))
 
 (defn log [message data]
   (.log js/console message (.stringify js/JSON (clj->js data))))
@@ -23,7 +25,9 @@
   (when (vector? ?data)
     (let [[old-map new-map] ?data]
       (if (:first-open? new-map)
-        (log "Channel socket successfully established!: %s" new-map)
+        (do 
+          (log "Channel socket successfully established!: %s" new-map)
+          (rf/dispatch [:socket-connected]))
        ;;(log "Channel socket state change: %s" ?data)
         (log "Socket not connected" nil)))))
 

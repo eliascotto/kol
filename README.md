@@ -7,6 +7,11 @@
 - styles `npm run styles-watch`
 - electron: `npx electron .`
 
+## Terminology
+
+- `esexpr`: extended symbolic expression. Includes position, tag, type, children, etc.
+- `vld`: visual language document. Represent the current document. Is composed by a series or `esexpr`.
+
 ## License
 
 Copyright © 2022

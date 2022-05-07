@@ -44,3 +44,13 @@
   "Add a new block."
   [source callback]
   (send-msg! [:expr/add-block source] callback))
+
+(defn insert-right
+  "Insert `expr` on the left of the `node`."
+  [source node expr callback]
+  (send-msg! [:expr/insert-expr (map-keys source node expr)] callback))
+
+(defn remove-expr
+  "Insert `expr` on the left of the `node`."
+  [source node callback]
+  (send-msg! [:expr/remove-expr (map-keys source node)] callback))

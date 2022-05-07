@@ -1,7 +1,8 @@
 (ns kol.subs
   (:require
    [re-frame.core :as rf :refer [reg-sub]]
-   [kol.fn.esexpr :refer [get-block-by-id]]))
+   [kol.fn.vld.core :refer [get-block-by-id]]
+   [kol.utils :refer [filter-kv]]))
 
 (defn db-get [& keys]
   (fn [db _]
@@ -115,18 +116,6 @@
    (:sexpr-list block)))
 
 (reg-sub
- :sexpr-first
- :<- [:block]
- (fn [block _]
-   (first (:sexpr-list block))))
-
-(reg-sub
- :sexpr-input-value
- :<- [:block]
- (fn [block _]
-   (:input block)))
-
-(reg-sub
  :sexpr-input-string?
  :<- [:block]
  (fn [block _]
@@ -139,19 +128,40 @@
    (get-in blocks [:focused-item :ref])))
 
 (reg-sub
- :focused-item-value
- :<- [:blocks]
- (fn [blocks _]
-   (get-in blocks [:focused-item :value])))
-
-(reg-sub
  :blocks-items
  :<- [:blocks]
  (fn [blocks _]
    (:items blocks)))
 
 (reg-sub
+ :items-by-row
+ :<- [:blocks-items]
+ (fn [items [_ id row]]
+   (filter-kv (fn [key _]
+                (and (= (:id key) id)
+                     (= (:row key) row)))
+              items)))
+
+(reg-sub
  :item
  :<- [:blocks-items]
  (fn [items [_ k]]
    (get items k)))
+
+(reg-sub
+ :item-value
+ :<- [:blocks-items]
+ (fn [items [_ k]]
+   (get-in items [k :value])))
+
+(reg-sub
+ :item-ref
+ :<- [:blocks-items]
+ (fn [items [_ k]]
+   (get-in items [k :ref])))
+
+(reg-sub
+ :item-type
+ :<- [:blocks-items]
+ (fn [items [_ k]]
+   (get-in items [k :type])))

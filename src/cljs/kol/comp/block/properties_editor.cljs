@@ -2,7 +2,7 @@
   (:require
    [reagent.core :as r]
    [re-frame.core :as rf]
-   [kol.fn.parser :as parser]
+   [kol.fn.parser.core :as parser]
    [kol.definitions :as defs]
    [kol.comp.icon.core :refer [icon]]
    [kol.server :as server]

@@ -67,6 +67,18 @@
     (let [resp (esexpr/add-block ?data)]
       (?reply-fn resp))))
 
+(defmethod -event-msg-handler :expr/insert-expr
+  [{:as ev-msg :keys [?data :?reply-fn]}]
+  (when (and ?data ?reply-fn)
+    (let [resp (esexpr/insert-expr ?data)]
+      (?reply-fn resp))))
+
+(defmethod -event-msg-handler :expr/remove-expr
+  [{:as ev-msg :keys [?data :?reply-fn]}]
+  (when (and ?data ?reply-fn)
+    (let [resp (esexpr/remove-expr ?data)]
+      (?reply-fn resp))))
+
 (comment
   (resolve :mc)
   (-> #'str
