@@ -37,3 +37,7 @@
   after the shortest possible delay."
   [callback]
   (js/setTimeout callback 0))
+
+(def set-timeout
+  "Js setTimeout"
+  (.-setTimeout js/window))

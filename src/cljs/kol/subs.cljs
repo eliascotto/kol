@@ -76,9 +76,9 @@
 
 (def-sub :source-esexpr)
 
-;;
+;; ----------------------
 ;; BLOCKS
-;;
+;; ----------------------
 
 (reg-sub
  :blocks
@@ -97,9 +97,9 @@
  (fn [blocks _]
    (:list blocks)))
 
-;;
+;; ----------------------
 ;; BLOCK
-;;
+;; ----------------------
 
 ;; Signal function
 ;; see: https://day8.github.io/re-frame/subscriptions/#reg-sub
@@ -165,3 +165,17 @@
  :<- [:blocks-items]
  (fn [items [_ k]]
    (get-in items [k :type])))
+
+;; ----------------------
+;; Sidebar
+;; ----------------------
+
+(reg-sub
+ :sidebar
+ (fn [db _]
+   (get-in db [:sidebar :current])))
+
+(reg-sub
+ :sidebar-width
+ (fn [db _]
+   (get-in db [:sidebar :width])))

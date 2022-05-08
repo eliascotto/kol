@@ -98,3 +98,13 @@
           (.addRange sel range)))
       (when (instance? js/HTMLElement el)
         (.focus el)))))
+
+
+(defn select-content
+  "Create a new selection with the node content."
+  [el]
+  (let [sel (.getSelection js/window)
+        range (.createRange js/document)]
+    (.removeAllRanges sel)
+    (.selectNodeContents range el)
+    (.addRange sel range)))

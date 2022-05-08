@@ -8,7 +8,7 @@
 (defn workspace []
   (let [exsrc @(rf/subscribe [:source-esexpr])
         _ (rf/dispatch [:reset-blocks-list])]
-    [:div {:class ["px-5" "py-3" "h-full" "overflow-y-auto"]
+    [:div {:class ["px-5" "py-3" "h-full" "overflow-auto"]
            :on-click #(rf/dispatch [:reset-selected-block])}
      [:div {:class ["flex" "flex-col" "items-start" "justify-start"]}
       (for [blk (esxepr->blk exsrc)]

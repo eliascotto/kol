@@ -11,7 +11,7 @@
    [mount.core :as mount])
   (:gen-class))
 
-;; log uncaught exceptions in threads
+;; Log uncaught exceptions in threads
 (Thread/setDefaultUncaughtExceptionHandler
  (reify Thread$UncaughtExceptionHandler
    (uncaughtException [_ thread ex]
@@ -23,6 +23,11 @@
   [["-p" "--port PORT" "Port number"
     :parse-fn #(Integer/parseInt %)]])
 
+
+;; ----------------------
+;; Server
+;; ----------------------
+
 (mount/defstate ^{:on-reload :noop} http-server
   :start
   (http/start
@@ -33,6 +38,11 @@
   :stop
   (http/stop http-server))
 
+
+;; ----------------------
+;; nREPL
+;; ----------------------
+
 (mount/defstate ^{:on-reload :noop} repl-server
   :start
   (when (env :nrepl-port)
@@ -42,12 +52,10 @@
   (when repl-server
     (nrepl/stop repl-server)))
 
-(mount/defstate ^{:on-reload :noop} nrepl-server
-  :start
-  (nrepl/start {:bind "localhost" :port 7001 :transport-fn transport/edn})
-  :stop
-  (when nrepl-server
-    (nrepl/stop nrepl-server)))
+
+;; ----------------------
+;; App
+;; ----------------------
 
 (defn stop-app []
   (doseq [component (:stopped (mount/stop))]

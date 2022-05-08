@@ -7,7 +7,8 @@
    [kol.events.repl]
    [kol.events.blocks]
    [kol.events.source]
-   [kol.events.sexpr]))
+   [kol.events.sexpr]
+   [kol.events.sidebar]))
 
 ;; ----------------------
 ;; Helpers
@@ -35,7 +36,12 @@
     5  \"buzz\"
     n))"
    ;; esexpr extracted from server
-   :source-esexpr nil})
+   :source-esexpr nil
+   ;; sidebar
+   :sidebar 
+   {:current :repl
+    :width 400 ; px
+    }})
 
 ;; ----------------------
 ;; Dispatchers

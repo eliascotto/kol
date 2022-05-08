@@ -34,9 +34,11 @@
                 old-argv (first (rest prev))]
             ;; Update caret position when :value has changed
             (when (not= (:value new-argv) (:value old-argv))
-              (if snapshot
-                (utils/set-caret-at-pos (get-el) snapshot)
-                (utils/place-caret (get-el))))))
+              (try (if snapshot
+                     (utils/set-caret-at-pos (get-el) snapshot)
+                     (utils/place-caret (get-el)))
+                   (catch js/Error e
+                     (println "Falied to set caret"))))))
 
         :reagent-render
         (fn [{:keys [value set-ref class attrs placeholder disabled

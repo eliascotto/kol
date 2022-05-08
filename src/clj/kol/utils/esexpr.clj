@@ -1,4 +1,5 @@
 (ns kol.utils.esexpr
+  (:refer-clojure :exclude [update remove])
   (:require
    [rewrite-clj.zip :as z]
    [kol.utils.core :refer [fn-ext-meta]]))
@@ -38,6 +39,8 @@
           (keyword? sexpr) (with-type :keyword)
           (number? sexpr)  (with-type :number)
           (string? sexpr)  (with-type :string)
+
+          (nil? sexpr) (with-type :nil)
 
           :else {:type (type sexpr)
                  :sexpr sexpr})))))
@@ -116,7 +119,7 @@
                          (:tag node))))
 
 
-(defn update-expr
+(defn update
   "Update an expression pointed by `node`
   with the `expr` value, inside the source code. 
   Returns a map composed by the new :esexpr and :source."
@@ -148,7 +151,7 @@
       z/right*))
 
 
-(defn insert-expr
+(defn insert
   "Add a new node with content `expr` at the
   `side` of `node`. On the :right side by default.
   Returns a map composed by the new :esexpr and :source."
@@ -162,7 +165,20 @@
     {:source new-source
      :esexpr (source->esexpr new-source)}))
 
-(defn remove-expr
+
+(defn update-and-insert
+  "Update the node with expr and add another node
+  on the right."
+  [{:keys [source node expr new-expr] :or {new-expr nil}}]
+  (let [new-source (-> (find-source-node source node)
+                       (z/replace expr)
+                       (z/insert-right new-expr)
+                       z/root-string)]
+    {:source new-source
+     :esexpr (source->esexpr new-source)}))
+
+
+(defn remove
   "Remove the node pointer by `node`.
   Returns a map composed by the new :esexpr and :source."
   [{:keys [source node]}]

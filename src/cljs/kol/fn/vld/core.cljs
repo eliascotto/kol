@@ -2,7 +2,8 @@
   "Visual Language Document."
   (:require
    [re-frame.core :as rf]
-   [kol.server :as server]))
+   [kol.server :as server]
+   [kol.comp.block.utils :refer [create-item-key]]))
 
 
 (defn fetch
@@ -30,7 +31,7 @@
   [(:position expr) (:tag expr)])
 
 
-(defn get-block-by-id 
+(defn get-block-by-id
   "Returns a block from blocks vector by its id."
   [blocks id]
   (-> #(= (:id %) id)
@@ -52,12 +53,27 @@
 
 
 (defn insert-item-right
-  [esexpr-node]
+  [esexpr-node item-key]
   (let [source @(rf/subscribe [:source])]
     (server/insert-right
      source      ; source
      esexpr-node ; esexpr-node of the block
      nil         ; value of new item
+     (fn [{:keys [source esexpr]}]
+       (let [new-item-key (create-item-key {:block-id (:id item-key)
+                                            :row-idx (:row item-key)
+                                            :col-idx (inc (:col item-key))})]
+         (rf/dispatch [:set-empty-item new-item-key]))
+       (rf/dispatch [:set-source-with-esexpr source esexpr])))))
+
+
+(defn update-and-insert-expr
+  [esexpr-node expr]
+  (let [source @(rf/subscribe [:source])]
+    (server/update-and-insert-expr
+     source      ; source
+     esexpr-node ; esexpr-node of the block
+     expr
      (fn [{:keys [source esexpr]}]
        (rf/dispatch [:set-source-with-esexpr source esexpr])))))
 

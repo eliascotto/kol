@@ -56,3 +56,13 @@
  :reset-item-selected
  (fn [db [_ k]]
    (update-in db [:blocks :items k] dissoc :selected)))
+
+(reg-event-db
+ :set-empty-item
+ (fn [db [_ k]]
+   (assoc-in db [:blocks :empty-item] k)))
+
+(reg-event-db
+ :reset-empty-item
+ (fn [db _]
+   (update db :blocks dissoc :empty-item)))

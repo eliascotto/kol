@@ -11,10 +11,12 @@
    [kol.comp.content-editable.core :as ce :refer [content-editable]]
    [kol.comp.content-editable.utils :as ce-utils]
    [kol.comp.block.utils :as blk-utils :refer [create-item-key
+                                               next-item-key
                                                focus-prev-item-row
                                                focus-next-item-row
                                                focus-prev-row
-                                               focus-next-row]]))
+                                               focus-next-row
+                                               select-item-content]]))
 
 
 (declare on-input-blur
@@ -57,6 +59,9 @@
                    "shadow-md" "rounded-md"
                    "flex" "flex-col" "items-start" "justify-start"
                    "border" "cursor-pointer"
+                   "pb-1.5"
+                   (when (pos? depth)
+                     "mt-1")
                    (if selected?
                      "border-slate-400" "border-transparent")]
            :on-click #(on-block-click % id)}
@@ -105,16 +110,12 @@
          ^{:key key}
          [map-container (map-keys expr row-idx col-idx block-id)]
 
-         (:symbol :number :keyword :string)
+         (:symbol :number :keyword :string :nil)
          ^{:key key}
          [item-container
           (create-editable-item expr row-idx col-idx block-id)]
 
-         nil
-         [item-container
-          (create-editable-item expr row-idx col-idx block-id)]
-
-         (println "Not-maching-type" (:type expr)))))
+         (println "Not-matching-type" (:type expr)))))
    exs))
 
 
@@ -181,14 +182,21 @@
                      (focus-next-item-row item-key))
       "ArrowUp"   (focus-prev-row item-key)
       "ArrowDown" (focus-next-row item-key)
-      ;; Add new sexpr when user press space and is not inside a string
+      ;; Add new sexpr when user press space and is not inside a string,
+      ;; save the current expr
       "Space" (when-not (= item-key :string)
                 (utils/stop-propagation e)
-                (vld/insert-item-right esexpr))
+                (vld/update-and-insert-expr esexpr (edn/read-string value))
+                (utils/set-timeout
+                 (fn []
+                   (focus-next-item-row item-key)
+                   (select-item-content (next-item-key item-key)))
+                 100))
       ;; When user press backspace and input is empty, remove the current node
       "Backspace" (when (empty? value)
                     (utils/stop-propagation e)
-                    (vld/remove-expr esexpr))
+                    (vld/remove-expr esexpr)
+                    (utils/set-timeout #(focus-prev-item-row item-key) 100))
       ;; When quote: add another quote if not a quote on the next character
       ;; "Quote" (let [caret-index (ce-utils/get-caret-index input-ref)
       ;;               next-char (get value (inc caret-index))]
@@ -271,14 +279,16 @@
 
 (defn vector-container
   [{:keys [expr row-idx col-idx block-id]}]
-  [:div {:class ["flex" "flex-row" "text-[13px]"]}
-   [:div {:class ["mr-1"]} "["]
+  [:div {:class ["flex" "flex-row" "text-[13px]" "rounded-md"
+                 "border-2" "border-slate-600" "px-1.5"]}
+  ;;  [:div {:class ["mr-1"]} "["]
    [:div {:class ["flex" "flex-row"]}
     (create-expr {:exs (:children expr)
                   :row-idx row-idx
                   :block-id block-id
                   :col-idx-offset col-idx})]
-   [:div {:class ["ml-1"]} "]"]])
+  ;;  [:div {:class ["ml-1"]} "]"]
+   ])
 
 
 (defn map-container
@@ -301,12 +311,13 @@
 
 (defn header-container [& child]
   [:div {:class ["flex" "flex-row" "items-center"
-                 "py-1" "px-2"]}
+                 "w-full" "py-1" "px-2"]}
    child])
 
 
 (defn row-container [& child]
-  [:div {:class ["flex" "flex-row" "items-center"]}
+  [:div {:class ["flex" "flex-row" "items-center"
+                 "px-2"]}
    child])
 
 
@@ -316,7 +327,9 @@
   (str "bg-slate-" (if (even? depth) 800 700)))
 
 
-(defn blur-input []
+(defn blur-input
+  "Blur current input element."
+  []
   (let [active-el (.-activeElement js/document)]
     (.blur active-el)
     (rf/dispatch [:reset-selected-block])))

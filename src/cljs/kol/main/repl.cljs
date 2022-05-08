@@ -5,7 +5,7 @@
    ["net" :as net]
    [cljs.reader :as reader]))
 
-(def ^:private default-port 7001)
+(def ^:private default-port 7000)
 
 ;; net.Socket
 (def socket (atom nil))
