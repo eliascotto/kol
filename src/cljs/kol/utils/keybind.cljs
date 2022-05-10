@@ -2,6 +2,7 @@
   (:require
    [reagent.core :as r]
    [clojure.string :as string]
+   [kol.utils :refer [in?]]
    [kol.utils.core :as utils]))
 
 (def ^:private key-evt-attrs
@@ -37,7 +38,7 @@
           km
           (recur (rest metas)
                  (let [k (-> metas first keyword)]
-                   (if (utils/in? (keys km) k)
+                   (if (in? (keys km) k)
                      (assoc km k true)
                      (if (= k :cmd)
                        (assoc km (if utils/mac-os? :meta :ctrl) true)

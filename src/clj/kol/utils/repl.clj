@@ -2,16 +2,12 @@
   (:refer-clojure :exclude [connect])
   (:require
    [nrepl.core :as nrepl]
+   [clojure.tools.logging :as log]
+   [kol.utils :refer [in?]]
    [kol.config :refer [env]]))
-
 
 ;; nREPL connection
 (def conn (atom nil))
-;; nREPL session, obtained with `clone`
-(def session (atom nil))
-
-
-(declare on-connect)
 
 
 (defn connect
@@ -19,24 +15,56 @@
   ([]
    (connect (env :nrepl-port)))
   ([port]
-   (reset! conn (nrepl/connect :port port))
-   (on-connect)))
+   (if-not @conn
+     (let [new-conn (nrepl/connect :port port)]
+       (log/info "Connected to REPL on port " port)
+       (reset! conn new-conn)
+       new-conn)
+     @conn)))
+
+
+(defn send-message!
+  "Send a message to the REPL, creating a new
+  connection if necessary.
+  Receives named arguments as
+   - `op`: string or keyword for operation (default \"eval\")
+   - `code`: string containing code."
+  [msg]
+  (when (nil? @conn)
+    (connect))
+  (-> (nrepl/client @conn 1000)   ; message receive timeout required
+      (nrepl/message msg)
+      doall))
+
+
+(defn close
+  "Close the connection with the REPL."
+  []
+  (when @conn
+    (send-message! {:op "close"})))
 
 
 (defn eval-expr
-  [expr]
-  (-> (nrepl/client @conn 1000)    ; message receive timeout required
-      (nrepl/message {:op "eval" :code expr})
-      nrepl/response-values))
-
-
-(defn on-connect
-  []
-  (-> (nrepl/client @conn 1000)    ; message receive timeout required
-      (nrepl/message {:op "clone"})
-      first))
+  "Evaluate an expression into the REPL and
+  associate a `timestamp` to the reply.
+  Accepts an optional session string."
+  [& {:keys [expr session] :or {session nil}}]
+  (->> (cond-> {:op "eval"
+                :code expr}
+         (string? session) (assoc :session session))
+       (send-message!)
+       (map (fn [rep]
+              ;; Append a new #inst timestamp to the map with :status => "done" 
+              (if (and (contains? rep :status)
+                       (in? (:status rep) "done"))
+                (assoc rep :timestamp (java.util.Date.))
+                rep)))))
 
 (comment
   (connect 7000)
-  (eval-expr "(time (reduce + (range 1e6)))")
+  (send-message! {:op "clone"})
+  (eval-expr {:expr "(time (reduce + (range 1e6)))" :session "aa5e7764-1d56-4005-89c8-4aba492b0033"})
+  (eval-expr :expr "1")
+  (eval-expr :expr "*1")
+  (send-message! {:op "describe"})
   )

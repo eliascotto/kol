@@ -11,6 +11,7 @@
   [[[i x] coll] & body]
   `(for [[~i ~x] (map-indexed vector ~coll)] ~@body))
 
+
 (defmacro rep->
   "Apply `form` to `x`, `n` times, using thread macro `->`."
   [n x form]
@@ -52,5 +53,4 @@
                               b 2
                               c (+ a b)]
                              (println "yeah!")
-                             c))
-  )
+                             c)))

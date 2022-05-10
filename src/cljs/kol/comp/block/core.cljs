@@ -56,12 +56,11 @@
         bg-color (block-bg-color depth)]
     [:div {:class [bg-color "text-slate-200"
                    "w-fit" "min-w-[90px]"
-                   "shadow-md" "rounded-md"
+                   "shadow-md" "rounded-sm"
                    "flex" "flex-col" "items-start" "justify-start"
                    "border" "cursor-pointer"
-                   "pb-1.5"
                    (when (pos? depth)
-                     "mt-1")
+                     "my-1")
                    (if selected?
                      "border-slate-400" "border-transparent")]
            :on-click #(on-block-click % id)}
@@ -139,7 +138,7 @@
   (let [item-key (create-item-key (map-keys row-idx col-idx block-id))
         {:keys [value type]} @(rf/subscribe [:item item-key])]
     [content-editable
-     {:class ["bg-transparent" "outline-none" "text-[13px]"
+     {:class ["bg-transparent" "outline-none" "text-[12px]"
               "font-mono" "w-auto" "cursor-text"
               (when (= type :keyword) "text-[#78D1E1]")
               (when (= type :number) "text-[#78D1E1]")
@@ -279,28 +278,28 @@
 
 (defn vector-container
   [{:keys [expr row-idx col-idx block-id]}]
-  [:div {:class ["flex" "flex-row" "text-[13px]" "rounded-md"
-                 "border-2" "border-slate-600" "px-1.5"]}
-  ;;  [:div {:class ["mr-1"]} "["]
-   [:div {:class ["flex" "flex-row"]}
+  [:div {:class ["flex" "flex-row" "text-[12px]" "rounded-sm"
+                 "px-1" "items-center"]}
+   [:div {:class ["mr-1"]} "["]
+   [:div {:class ["flex" "flex-row" "items-center"]}
     (create-expr {:exs (:children expr)
                   :row-idx row-idx
                   :block-id block-id
                   :col-idx-offset col-idx})]
-  ;;  [:div {:class ["ml-1"]} "]"]
-   ])
+   [:div {:class ["ml-1"]} "]"]])
 
 
 (defn map-container
   [{:keys [expr row-idx col-idx block-id]}]
-  [:div {:class ["flex" "flex-row" "text-[13px]"]}
+  [:div {:class ["flex" "flex-row" "text-[12px]" "items-center"]}
    [:div {:class ["mr-1"]} "{"]
-   [:div {:class ["flex" "flex-row"]}
+   [:div {:class ["flex" "flex-row" "items-center"]}
     (create-expr {:exs (:children expr)
                   :row-idx row-idx
                   :block-id block-id
                   :col-idx-offset col-idx})]
-   [:div {:class ["ml-1"]} "}"]])
+   [:div {:class ["ml-1"]} "}"]
+   ])
 
 
 (defn item-container

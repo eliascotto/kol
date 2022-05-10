@@ -19,12 +19,12 @@
   ([s]
    (write-repl s :output))
   ([s k]
-   (rf/dispatch [:repl-history-append {:type k :value s}])))
+   (rf/dispatch [:append-repl-history-item {:type k :value s}])))
 
 (defn- append-multiline
   "Append `val` to the multiline expression."
   [val]
-  (rf/dispatch [:repl-multiline-append val]))
+  (rf/dispatch [:append-repl-multiline-value val]))
 
 (defn- update-multiline
   "If `repl-multiline` is not empty, append `in` value to it."
@@ -54,15 +54,15 @@
 (defn- reset-repl-input
   "Clear the REPL input."
   []
-  (rf/dispatch [:repl-input-reset]))
+  (rf/dispatch [:reset-repl-input]))
 
 (defn- reset-repl
   "Reset the REPL state, except the history."
   []
-  (rf/dispatch [:repl-reset-all]))
+  (rf/dispatch [:reset-repl-all]))
 
 (defn- set-placeholder [val]
-  (rf/dispatch [:repl-set-placeholder val]))
+  (rf/dispatch [:set-repl-placeholder val]))
 
 (defn- parse-expr
   "Try parsing the input expression. Throw an exception if catches a missing

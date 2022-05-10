@@ -3,7 +3,7 @@
    [re-frame.core :as rf]
    [rewrite-clj.zip :as z]
    [kol.utils.log :as log]
-   [kol.utils.core :as utils]
+   [kol.utils :as utils]
    [kol.fn.vld.core :as vld]
    [kol.comp.block.code-wrappers :as wrapper]
    [kol.comp.block.common :as common]

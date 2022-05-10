@@ -1,80 +1,8 @@
-(ns kol.subs
+(ns kol.subs.blocks
   (:require
    [re-frame.core :as rf :refer [reg-sub]]
    [kol.fn.vld.core :refer [get-block-by-id]]
    [kol.utils :refer [filter-kv]]))
-
-(defn db-get [& keys]
-  (fn [db _]
-    (get-in db keys)))
-
-(defn def-sub
-  ([k]
-   (def-sub k k))
-  ([k-sub k]
-   (reg-sub k-sub (db-get k))))
-
-;; Subscriptions
-
-(reg-sub
- :common/route
- (fn [db _]
-   (-> db :common/route)))
-
-(reg-sub
- :route/page-id
- :<- [:common/route]
- (fn [route _]
-   (-> route :data :name)))
-
-(reg-sub
- :common/page
- :<- [:common/route]
- (fn [route _]
-   (-> route :data :view)))
-
-(reg-sub
- :common/error
- (fn [db _]
-   (:common/error db)))
-
-(reg-sub
- :repl
- (fn [db _]
-   (-> db :repl)))
-
-;; Collection of maps with the REPL command history.
-(reg-sub
- :repl-history
- :<- [:repl]
- (fn [repl _]
-   (:history repl)))
-
-;; Store the REPL input while typed in the input el
-(reg-sub
- :repl-input
- :<- [:repl]
- (fn [repl _]
-   (:input repl)))
-
-;; Store a multiline command as a single string
-(reg-sub
- :repl-multiline
- :<- [:repl]
- (fn [repl _]
-   (:multiline repl)))
-
-;; Set a command input placeholder in case of EOF error
-(reg-sub
- :repl-placeholder
- :<- [:repl]
- (fn [repl _]
-   (:placeholder repl)))
-
-;; Source code
-(def-sub :source)
-
-(def-sub :source-esexpr)
 
 ;; ----------------------
 ;; BLOCKS
@@ -165,17 +93,3 @@
  :<- [:blocks-items]
  (fn [items [_ k]]
    (get-in items [k :type])))
-
-;; ----------------------
-;; Sidebar
-;; ----------------------
-
-(reg-sub
- :sidebar
- (fn [db _]
-   (get-in db [:sidebar :current])))
-
-(reg-sub
- :sidebar-width
- (fn [db _]
-   (get-in db [:sidebar :width])))

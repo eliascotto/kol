@@ -31,3 +31,9 @@
                                    "b" {:some "b"}
                                    "c" {:some "c"}})
   )
+
+
+(defn in?
+  "Returns true if `coll` contains `el`."
+  [coll el]
+  (some #(= el %) coll))

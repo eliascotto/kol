@@ -3,12 +3,21 @@
    [re-frame.core :as rf]
    [kol.fn.parser.core :refer [esxepr->blk]]
    [kol.fn.vld.core :as vld]
-   [kol.comp.icon.core :refer [icon]]))
+   [kol.comp.icon.core :refer [icon]]
+   [kol.comp.repl.visual :as repl-visual]))
+
+(declare visual)
 
 (defn workspace []
+  [:div {:class ["flex" "flex-col" "h-full"]}
+   [visual]
+   [repl-visual/repl-input-el]])
+
+
+(defn visual []
   (let [exsrc @(rf/subscribe [:source-esexpr])
         _ (rf/dispatch [:reset-blocks-list])]
-    [:div {:class ["px-5" "py-3" "h-full" "overflow-auto"]
+    [:div {:class ["flex-1" "px-5" "py-3" "h-full" "overflow-auto"]
            :on-click #(rf/dispatch [:reset-selected-block])}
      [:div {:class ["flex" "flex-col" "items-start" "justify-start"]}
       (for [blk (esxepr->blk exsrc)]

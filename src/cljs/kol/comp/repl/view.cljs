@@ -85,5 +85,5 @@
                   :on-focus #(reset! has-focus true)
                   :on-blur #(reset! has-focus false)
                   :on-key-down on-keydown
-                  :on-change #(rf/dispatch [:repl-input-set (get-val %)])}]]]])
+                  :on-change #(rf/dispatch [:set-repl-input (get-val %)])}]]]])
     (finally (r/dispose! scroll-watch))))

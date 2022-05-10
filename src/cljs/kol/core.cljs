@@ -9,9 +9,10 @@
    [markdown.core :refer [md->html]]
    [kol.ajax :as ajax]
    [kol.events.core]
-   [kol.subs]
+   [kol.subs.core]
    [kol.definitions]
    [kol.socket :as socket]
+   [kol.server :as server]
    [kol.pages.create :refer [create-page]]
    [kol.pages.source :refer [source-page]]
    [kol.comp.navbar.core :refer [navbar]]
@@ -69,7 +70,8 @@
 
 (defn init! []
   (start-router!)
-  (socket/start! #(vld/fetch))
+  (socket/start! (fn []
+                   (vld/fetch)))
   (ajax/load-interceptors!)
   (mount-components)
   (rf/dispatch-sync [:initialize-db]))

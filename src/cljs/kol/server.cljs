@@ -15,7 +15,7 @@
 (defn- send-msg! 
   "Send a message to the server via websocket."
   [event callback]
-  (chsk-send! event 200 ; max timeout
+  (chsk-send! event 2000 ; max timeout
               (fn [reply]
                 (if (sente/cb-success? reply)
                   (callback reply)
@@ -74,3 +74,17 @@
   "Insert `expr` on the left of the `node`."
   [source node callback]
   (send-msg! [:expr/remove (map-keys source node)] callback))
+
+
+(defn new-repl-session
+  "Create a new REPL session returning the map."
+  [callback]
+  (send-msg! [:repl/new-session] callback))
+
+
+(defn eval-expr 
+  "Evaluate `expr` inside `props` in the REPL on the server, 
+  via websocket."
+  [props callback]
+  (send-msg! [:repl/eval props] callback))
+
