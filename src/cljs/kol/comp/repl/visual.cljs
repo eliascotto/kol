@@ -35,7 +35,7 @@
   []
   (let [vrepl-history-values @(rf/subscribe [:vrepl-history-values])]
     [:div {:class ["flex" "flex-col" "w-full" "h-full"
-                   "px-2" "py-1" "overflow-auto"]
+                   "px-2" "pt-1" "pb-2" "overflow-auto"]
            :ref #(rf/dispatch [:set-vrepl-input-ref %])}
      (for-indexed [[idx item] vrepl-history-values]
                   ^{:key (str "repl-history-item-" idx)}

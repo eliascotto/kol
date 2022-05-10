@@ -54,10 +54,7 @@
 (rf/reg-fx
  :focus-to-vrepl-input
  (fn [ref]
-   (r/after-render
-    (fn []
-      (println "Set scroll" (type ref) ref)
-      (set! (.-scrollTop ref) (.-scrollHeight ref))))))
+   (r/after-render #(repl-utils/scroll-bottom-vrepl ref))))
 
 (reg-event-db
  :set-vrepl-session

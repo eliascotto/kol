@@ -41,3 +41,9 @@
                        (assoc :timestamp (get item :timestamp)))))
               (into {})))
        history))
+
+
+(defn scroll-bottom-vrepl
+  "Scroll vREPL history to the bottom."
+  [ref]
+  (set! (.-scrollTop ref) (.-scrollHeight ref)))
