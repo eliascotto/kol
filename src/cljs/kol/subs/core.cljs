@@ -4,7 +4,8 @@
    [kol.subs.repl]
    [kol.subs.sidebar]
    [kol.subs.blocks]
-   [kol.subs.source]))
+   [kol.subs.source]
+   [kol.subs.workspace]))
 
 (reg-sub
  :common/route

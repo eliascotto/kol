@@ -8,6 +8,7 @@
    [kol.utils.core :as utils]
    [kol.macros :refer [for-indexed]]
    [kol.comp.repl.utils :as repl-utils]
+   [kol.comp.repl.view :refer [prompt-el]]
    ["date-fns/format" :default format]))
 
 (declare repl-input-el
@@ -25,7 +26,8 @@
     (let [sidebar-width @(rf/subscribe [:sidebar-width])]
       [:div {:class ["bg-slate-800" "flex" "flex-row"]
              :style {:width (str sidebar-width "px")}}
-       [:div {:class ["h-full" "w-0.5" "bg-slate-500"
+       ;; Sidebar resize handler
+       [:div {:class ["h-full" "w-[1px]" "bg-slate-600"
                       "hover:bg-slate-400"
                       "cursor-col-resize"]}]
        [repl-history-output]])))
@@ -46,9 +48,9 @@
   [{:keys [value err timestamp]}]
   (let [error? (not (nil? err))]
     [:div {:class ["text-[13px]" "font-mono"]}
-     [:div {:class ["text-[11px]" "text-slate-600" "text-right"]}
-      (format timestamp "yyyy-MM-dd HH:mm:ss.SSS")]
-     [:div {:class ["text-slate-300" (when error? "text-red-400")]}
+     [:span {:class ["text-amber-500" "pr-2"]}
+      ">"]
+     [:span {:class ["text-slate-300" (when error? "text-red-400")]}
       (or value err)]]))
 
 
@@ -65,11 +67,13 @@
 
 (defn repl-input-el []
   (let [value @(rf/subscribe [:vrepl-input])]
-    [:div {:class ["flex" "flex-row" "px-2" "py-1" "bg-slate-700"]}
-     [:div {:class ["text-slate-400" "text-[13px]" "font-mono"
+    [:div {:class ["flex" "flex-row" "px-2" "py-1" "bg-slate-800"
+                   "text-[12px]"
+                   "border-t" "border-slate-600"]}
+     [:div {:class ["text-slate-400" "font-mono"
                     "pr-2"]}
       "Eval:"]
-     [:textarea {:class ["w-full" "text-[13px]"
+     [:textarea {:class ["w-full"
                          "font-mono" "bg-transparent"
                          "shadow-md"
                          "text-white" "outline-none"
@@ -84,6 +88,7 @@
   (let [el (.-target e)]
     ;; Resize height of input textarea
     (set! (.. el -style -height) (str (.-scrollHeight el) "px"))
+    (repl-utils/reset-vrepl-history-input-index)
     (rf/dispatch [:set-vrepl-input (utils/get-val e)])))
 
 
@@ -98,6 +103,12 @@
       "Enter" (when-not (.-shiftKey e)
                 (utils/stop-propagation e)
                 (eval-expr value)
+                (repl-utils/reset-vrepl-history-input-index)
+                (rf/dispatch [:append-vrepl-history-input])
                 (rf/dispatch [:reset-vrepl-input]))
+      ;; When arrow up, go back in input history
+      "ArrowUp" (repl-utils/set-prev-history-vrepl-input)
+      ;; When arrow down, go forward in input history
+      "ArrowDown" (repl-utils/set-next-history-vrepl-input)
       ;; default
       nil)))

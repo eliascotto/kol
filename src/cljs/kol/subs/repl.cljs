@@ -66,3 +66,13 @@
  :vrepl-input-ref
  (fn [db _]
    (get-in db [:vrepl :input-ref])))
+
+(reg-sub
+ :vrepl-history-input
+ (fn [db _]
+   (get-in db [:vrepl :history-input])))
+
+(reg-sub
+ :vrepl-history-input-index
+  (fn [db _]
+   (get-in db [:vrepl :history-input-index])))

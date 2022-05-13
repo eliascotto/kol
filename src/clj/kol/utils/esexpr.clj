@@ -13,7 +13,7 @@
   (if (= (z/tag zloc) :newline)
     {:newlines (count (z/string zloc))}
     (when-not (z/whitespace? zloc)
-      (let [sexpr (z/sexpr zloc)
+      (let [sexpr  (z/sexpr zloc)
             common {:sexpr sexpr
                     :position (z/position zloc)
                     :tag (z/tag zloc)}
@@ -77,7 +77,7 @@
 (comment
   (source->esexpr
    "(defn fizz-buzz [n]
-   n)\n\n()"))
+     n)\n\n()"))
 
 
 (defn source->esexpr

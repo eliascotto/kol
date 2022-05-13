@@ -24,12 +24,23 @@
    ["lezer-generator" :as lg]
    [shadow.resource :as rc]))
 
-(declare update-source)
+(declare update-source
+         editor-el
+         make-state)
+
+(defn editor []
+  (let [source @(rf/subscribe [:source])]
+    [:div {:class ["px-2" "py-1" "text-[12px]"]}
+     [editor-el source]]))
 
 (def parser
   (lg/buildParser
    (rc/inline "./clojure.grammar")
    #js{:externalProp n/node-prop}))
+
+
+(def extended-keymap
+  (j/lit []))
 
 (defonce extensions
   #js[theme
@@ -109,8 +120,3 @@
                        "monospace"
                        "overflow-auto"]
                :ref #(reset! editor-ref %)}])})))
-
-(defn editor []
-  (let [source @(rf/subscribe [:source])]
-    [:div {:class ["px-2" "py-1"]}
-     [editor-el source]]))

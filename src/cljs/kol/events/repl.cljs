@@ -81,3 +81,14 @@
  :set-vrepl-input-ref
  (fn [db [_ ref]]
    (assoc-in db [:vrepl :input-ref] ref)))
+
+(reg-event-db
+ :append-vrepl-history-input
+ (fn [db _]
+   (let [value (get-in db [:vrepl :input])]
+     (update-in db [:vrepl :history-input] (fnil conj []) value))))
+
+(reg-event-db
+ :set-input-history-index
+ (fn [db [_ index]]
+   (assoc-in db [:vrepl :history-input-index] index)))

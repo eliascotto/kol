@@ -26,12 +26,13 @@
                    "shadow-md"
                    "sticky"
                    "top-0"
+                   "border-b" "border-slate-600"
                    "bg-slate-800"]
            :style {:WebkitAppRegion "drag"}}
      [:div {:class ["flex" "flex-row" "items-center" "justify-center"
                     "text-xs" "text-slate-400"
                     "w-4" "h-4"]
             :style {:WebkitAppRegion "no-drag"}}
-      (for [p [:create :source :explore]]
+      (for [p [:create :explore]]
         ^{:key (str "page-header-title-" p)}
         [page-item p (= page p)])]]))

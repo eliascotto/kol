@@ -8,7 +8,8 @@
    [kol.events.blocks]
    [kol.events.source]
    [kol.events.sexpr]
-   [kol.events.sidebar]))
+   [kol.events.sidebar]
+   [kol.events.workspace]))
 
 ;; ----------------------
 ;; Helpers
@@ -21,7 +22,9 @@
   (str base-url route))
 
 (def default-db
-  {;; Repl configuration
+  {;; Current visualization
+   :workspace-type :code
+   ;; Repl configuration
    :repl
    {:history [{:type :special
                :value "Clojure REPL v1.0"}]}
@@ -29,8 +32,16 @@
    :blocks
    {:selected nil}
    ;; Current file source
-   :source "(defn fizz-buzz [n]
-  (case n
+   :source "(comment
+  (fizz-buzz 1)
+  (fizz-buzz 3)
+  (fizz-buzz 5)
+  (fizz-buzz 15)
+  (fizz-buzz 17)
+  (fizz-buzz 42))
+
+(defn fizz-buzz [n]
+  (condp (fn [a b] (zero? (mod b a))) n
     15 \"fizzbuzz\"
     3  \"fizz\"
     5  \"buzz\"
@@ -38,10 +49,10 @@
    ;; esexpr extracted from server
    :source-esexpr nil
    ;; sidebar
-   :sidebar 
+   :sidebar
    {:current :repl
-    :width 400 ; px
-    }})
+    :width 400}}) ; px
+    
 
 ;; ----------------------
 ;; Dispatchers

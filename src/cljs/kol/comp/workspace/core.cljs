@@ -4,14 +4,26 @@
    [kol.fn.parser.core :refer [esxepr->blk]]
    [kol.fn.vld.core :as vld]
    [kol.comp.icon.core :refer [icon]]
-   [kol.comp.repl.visual :as repl-visual]))
+   [kol.comp.repl.visual :as repl-visual]
+   [kol.comp.editor.core :refer [editor]]))
 
-(declare visual)
+(declare visual
+         editor-container)
 
 (defn workspace []
-  [:div {:class ["flex" "flex-col" "h-full"]}
-   [visual]
-   [repl-visual/repl-input-el]])
+  (let [workspace-type @(rf/subscribe [:workspace-type])]
+    [:div {:class ["flex" "flex-col" "h-full"]}
+     (if (= workspace-type :visual)
+       [visual]
+       [editor-container])
+     [repl-visual/repl-input-el]]))
+   
+
+
+(defn editor-container []
+  [:div {:class ["flex-1" "h-full" "overflow-auto"
+                 "bg-gray-900"]}
+   [editor]])
 
 
 (defn visual []

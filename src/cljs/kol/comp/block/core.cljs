@@ -35,7 +35,8 @@
          row-container
          header-container
          function-el
-         blur-input)
+         blur-input
+         init-empty-block)
 
 
 (def default-fn
@@ -53,29 +54,34 @@
         esexpr (:esexpr block)
         rows (split-rows esexpr)
         depth (dec (count (:location esexpr)))
-        bg-color (block-bg-color depth)]
+        bg-color (block-bg-color depth)
+        _ (when (empty? rows)
+            (init-empty-block))]
+    ;; Block element
     [:div {:class [bg-color "text-slate-200"
                    "w-fit" "min-w-[90px]"
                    "shadow-md" "rounded-sm"
                    "flex" "flex-col" "items-start" "justify-start"
                    "border" "cursor-pointer"
-                   (when (pos? depth)
-                     "my-1")
+                   (when (zero? depth)
+                     "pb-2")
                    (if selected?
                      "border-slate-400" "border-transparent")]
            :on-click #(on-block-click % id)}
-     ;; Block header
+     ;; Block header (first line)
      (let [row (first rows)
            fn-call (first row)
            args (rest row)]
        [header-container
+        ;; Block functions
         ^{:key (str "block-function-" (kebab-case (str id)))}
         [function-el fn-call id]
+        ;; Block inline arguments
         (create-expr {:exs args
                       :row-idx 0
                       :block-id id
                       :col-idx-offset 1})])
-     ;; Block arguments
+     ;; Block arguments (body)
      (for-indexed [[idx row] (rest rows)]
                   ^{:key (str "block-row-" (kebab-case (str id))
                               "row-" idx)}
@@ -83,6 +89,10 @@
                    (create-expr {:exs row
                                  :row-idx (inc idx)
                                  :block-id id})])]))
+
+
+(defn init-empty-block []
+  )
 
 
 (defn create-expr
@@ -146,7 +156,7 @@
               (when (and (zero? row-idx) (zero? col-idx))
                 "text-[#67E480]")]
 
-      :ref (rf/subscribe [:item-ref item-key])
+      :ref      (rf/subscribe [:item-ref item-key]) ; is just a reference
       :set-ref #(rf/dispatch [:update-item-ref item-key %])
       :value value
       :on-change   #(on-input-change % item-key)
@@ -271,8 +281,7 @@
 
 
 (defn function-el [esexpr block-id]
-  [:div {:class [;;"rounded-br-md" "rounded-tl-md"  "border" "border-slate-500"
-                 "mr-2"]}
+  [:div {:class ["mr-2"]}
    (create-editable-item esexpr 0 0 block-id)])
 
 

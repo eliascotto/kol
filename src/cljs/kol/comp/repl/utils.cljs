@@ -36,9 +36,9 @@
                        (contains? item :value)
                        (assoc :value (get item :value))
                        (contains? item :err)
-                       (assoc :err (get item :err))
-                       (contains? item :timestamp)
-                       (assoc :timestamp (get item :timestamp)))))
+                       (assoc :err (get item :err)))))
+                       ;;(contains? item :timestamp)
+                       ;;(assoc :timestamp (get item :timestamp))
               (into {})))
        history))
 
@@ -47,3 +47,34 @@
   "Scroll vREPL history to the bottom."
   [ref]
   (set! (.-scrollTop ref) (.-scrollHeight ref)))
+
+
+(defn reset-vrepl-history-input-index []
+  (rf/dispatch [:set-input-history-index 0]))
+
+
+(defn set-prev-history-vrepl-input
+  "Set the previous value of the vREPL as the current
+  input."
+  []
+  (let [current-index @(rf/subscribe [:vrepl-history-input-index])
+        history-input @(rf/subscribe [:vrepl-history-input])
+        idx (- (count history-input) (inc current-index))]
+    (when (> idx -1)
+      (rf/dispatch [:set-input-history-index (inc current-index)])
+      (let [new-value (get history-input idx)]
+        (println "Set input" idx new-value)
+        (rf/dispatch [:set-vrepl-input new-value])))))
+
+
+(defn set-next-history-vrepl-input
+  "Set the next value of the vREPL as the current
+  input."
+  []
+  (let [current-index @(rf/subscribe [:vrepl-history-input-index])
+        history-input @(rf/subscribe [:vrepl-history-input])
+        idx (- (count history-input) current-index)]
+    (when (> current-index 0)
+      (rf/dispatch [:set-input-history-index (dec current-index)])
+      (let [new-value (get history-input idx)]
+          (rf/dispatch [:set-vrepl-input new-value])))))

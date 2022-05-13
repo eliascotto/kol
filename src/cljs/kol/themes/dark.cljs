@@ -31,7 +31,7 @@
   (create-theme
    {"&" {:color (color :fg)
          :background-color "transparent"
-         :font-size "13px"
+         :font-size "12px"
          :font-family "\"Fira Code\",monospace,-apple-system,BlinkMacSystemFont,sans-serif"}
     ".cm-scroller" {:font-family "\"Fira Code\",monospace,-apple-system,BlinkMacSystemFont,sans-serif"}
     ".cm-content" {:caret-color (color :fg)}
